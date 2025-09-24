@@ -1,0 +1,11 @@
+package com.rkvk.automobile.automobileshop.auth.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class AuthenticationResponseDTO {
+    private String token;
+    private String role; // ADMIN or RECEPTIONIST
+}
