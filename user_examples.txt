@@ -1,0 +1,78 @@
+{
+  "username": "admin1",
+  "password": "adminpass",
+  "role": "ADMIN",
+  "firstName": "John",
+  "lastName": "Doe",
+  "houseNo": "123",
+  "street": "Main Street",
+  "locality": "Central",
+  "city": "Mumbai",
+  "pinCode": "400001"
+}
+
+{
+  "username": "admin2",
+  "password": "adminpass",
+  "role": "ADMIN",
+  "firstName": "Amit",
+  "lastName": "Sharma",
+  "houseNo": "45B",
+  "street": "Linking Road",
+  "locality": "Bandra",
+  "city": "Mumbai",
+  "pinCode": "400050"
+}
+{
+  "username": "reception1",
+  "password": "receptpass",
+  "role": "RECEPTIONIST",
+  "firstName": "Priya",
+  "lastName": "Menon",
+  "houseNo": "67",
+  "street": "Church Street",
+  "locality": "MG Road",
+  "city": "Bengaluru",
+  "pinCode": "560001"
+}
+{
+  "username": "reception2",
+  "password": "receptpass",
+  "role": "RECEPTIONIST",
+  "firstName": "Ravi",
+  "lastName": "Kumar",
+  "houseNo": "89A",
+  "street": "Park Street",
+  "locality": "New Market",
+  "city": "Kolkata",
+  "pinCode": "700016"
+}
+{
+  "username": "admin3",
+  "password": "adminpass",
+  "role": "ADMIN",
+  "firstName": "Neha",
+  "lastName": "Verma",
+  "houseNo": "12C",
+  "street": "Civil Lines",
+  "locality": "Ashok Nagar",
+  "city": "Delhi",
+  "pinCode": "110006"
+}
+{
+  "username": "reception3",
+  "password": "receptpass",
+  "role": "RECEPTIONIST",
+  "firstName": "Arjun",
+  "lastName": "Patel",
+  "houseNo": "221B",
+  "street": "Baker Street",
+  "locality": "Fort",
+  "city": "Pune",
+  "pinCode": "411001"
+}
+
+
+
+
+

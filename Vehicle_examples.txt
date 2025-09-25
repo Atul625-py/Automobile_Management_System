@@ -1,0 +1,33 @@
+{ 
+ "registrationNo": "MH12AB1234",
+ "brand": "Toyota",
+ "model": "Innova",
+ "year": 2020,
+ "fuelType": "Diesel",
+ "customerId": 1 
+}
+
+{
+  "registrationNo": "KA03CD5678",
+  "brand": "Hyundai",
+  "model": "Creta",
+  "year": 2022,
+  "fuelType": "Petrol",
+  "customerId": 2
+}
+{
+  "registrationNo": "DL09EF3456",
+  "brand": "Honda",
+  "model": "City",
+  "year": 2021,
+  "fuelType": "Petrol",
+  "customerId": 3
+}
+{
+  "registrationNo": "TS07GH7890",
+  "brand": "Mahindra",
+  "model": "XUV500",
+  "year": 2019,
+  "fuelType": "Diesel",
+  "customerId": 2
+}

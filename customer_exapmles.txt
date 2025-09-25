@@ -1,0 +1,34 @@
+{ 
+ "firstName": "Basweshwar", 
+ "lastName": "Thakkarwad", 
+ "houseNo": "45A", 
+ "street": "Hospital Road", 
+ "locality": "Saraswati Nagar", 
+ "city": "Nizamabad", 
+ "pinCode": "503001", 
+ "middleNames": ["Pradeep"], 
+ "emails": ["thakkarwadbasweshwar@gmail.com", "a@yahoo.com"] 
+}
+
+{
+  "firstName": "Ananya",
+  "lastName": "Reddy",
+  "houseNo": "12B",
+  "street": "Lakshmi Road",
+  "locality": "Kothapet",
+  "city": "Hyderabad",
+  "pinCode": "500035",
+  "middleNames": ["Sree"],
+  "emails": ["ananya.reddy@example.com", "ananya.sree@workmail.com"]
+}
+{
+  "firstName": "Rahul",
+  "lastName": "Patil",
+  "houseNo": "78",
+  "street": "Station Road",
+  "locality": "Shivaji Nagar",
+  "city": "Pune",
+  "pinCode": "411005",
+  "middleNames": [],
+  "emails": ["rahul.patil@example.com"]
+}
