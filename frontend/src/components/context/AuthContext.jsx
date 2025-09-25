@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
     const verified = localStorage.getItem("isVerified") === "true";
-    setUserRole("admin");
+    // setUserRole("admin");
     if (token) {
       setIsAuthenticated(true);
       setUserRole(role);
