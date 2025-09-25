@@ -20,7 +20,7 @@ const Register = () => {
     locality: "",
     city: "",
     state: "",
-    pincode: "",
+    pinCode: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -70,8 +70,8 @@ const Register = () => {
     if (!formData.locality.trim()) newErrors.locality = "Locality required";
     if (!formData.city.trim()) newErrors.city = "City required";
     if (!formData.state.trim()) newErrors.state = "State required";
-    if (!/^\d{6}$/.test(formData.pincode))
-      newErrors.pincode = "Valid 6-digit Pincode required";
+    if (!/^\d{6}$/.test(formData.pinCode))
+      newErrors.pinCode = "Valid 6-digit Pincode required";
     return newErrors;
   };
 
@@ -280,7 +280,7 @@ const Register = () => {
         {/* Step 2 */}
         {step === 2 && (
           <form className={styles.form} onSubmit={handleRegister}>
-            {["houseNo", "street", "locality", "city", "state", "pincode"].map(
+            {["houseNo", "street", "locality", "city", "state", "pinCode"].map(
               (field) => (
                 <div className={styles.inputGroup} key={field}>
                   <input

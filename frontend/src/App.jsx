@@ -7,6 +7,8 @@ import Register from "./components/Auth/Register";
 import { AuthProvider } from "./components/context/AuthContext";
 import RemoveManager from "./removal/Manager/RemoveManager";
 import RemoveCustomer from "./removal/Customer/RemoveCustomer";
+import Mechanics from "./components/Mechanics/Mechanics";
+import Services from "./components/services/Services";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -37,6 +39,8 @@ function App() {
             path="/register"
             element={!isLoggedIn ? <Register /> : <Navigate to="/" />}
           />
+          <Route path="/mechanics" element={<Mechanics></Mechanics>} />
+          <Route path="/services" element={<Services></Services>} />
           <Route
             path="/remove-customer"
             element={<RemoveCustomer></RemoveCustomer>}

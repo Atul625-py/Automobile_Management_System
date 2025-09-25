@@ -19,7 +19,7 @@ const Navbar = () => {
 
   return (
     <nav className={styles.navbar}>
-      <div className={styles.logo}>MyApp</div>
+      <div className={styles.logo}>RKVK Automobiles</div>
       <div className={styles.navLinks}>
         {/* Profile Dropdown */}
         <div
@@ -65,6 +65,12 @@ const Navbar = () => {
             Add User
           </Link>
         )}
+        <Link to="/mechanics" className={styles.navLink}>
+          Mechanics
+        </Link>
+        <Link to="/services" className={styles.navLink}>
+          Services
+        </Link>
       </div>
     </nav>
   );
