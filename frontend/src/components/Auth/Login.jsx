@@ -3,17 +3,45 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "./Auth.module.css";
 
 const Login = ({ onLogin }) => {
-  const [email, setEmail] = useState("");
+  const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Fake JWT token for demo (replace with backend fetch)
-    const token = "fake-jwt-token";
-    localStorage.setItem("token", token);
-    onLogin(true); // update login state in Navbar/App
-    navigate("/"); // redirect to home after login
+
+    try {
+      const dataToBeSent = JSON.stringify({ username, password });
+      console.log(dataToBeSent);
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: dataToBeSent,
+      });
+
+      const data = await response.json();
+      console.log(data);
+      if (!response.ok) {
+        throw new Error("Invalid username or password");
+      }
+
+      // Save token in localStorage
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("role", data.role || "manager");
+
+      console.log("User role set to:", data.role);
+
+      // Update login state in parent (Navbar/App)
+      onLogin(true);
+
+      // Redirect to home page
+      navigate("/");
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   return (
@@ -22,13 +50,13 @@ const Login = ({ onLogin }) => {
         <h2 className={styles.title}>Login to Your Account</h2>
 
         <form className={styles.form} onSubmit={handleSubmit}>
-          <label className={styles.label}>Email</label>
+          <label className={styles.label}>User Name</label>
           <input
             className={styles.input}
-            type="email"
-            placeholder="Write your email here"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text"
+            placeholder="Write your username here"
+            value={username}
+            onChange={(e) => setUserName(e.target.value)}
             required
           />
 
@@ -41,6 +69,8 @@ const Login = ({ onLogin }) => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+
+          {error && <p className={styles.error}>{error}</p>}
 
           <button className={styles.button} type="submit">
             🔑 Login

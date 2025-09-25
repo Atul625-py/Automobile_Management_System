@@ -61,6 +61,11 @@ const Navbar = () => {
         )}
 
         {(userRole === "manager" || userRole === "admin") && (
+          <Link to="/add-customer" className={styles.navLink}>
+            Add Customer
+          </Link>
+        )}
+        {userRole === "admin" && (
           <Link to="/register" className={styles.navLink}>
             Add User
           </Link>

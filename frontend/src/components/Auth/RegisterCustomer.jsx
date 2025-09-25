@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 import styles from "./Auth.module.css";
 import { AuthContext } from "../context/AuthContext";
 
-const Register = () => {
+const RegisterCustomer = () => {
   const { login, userRole, isAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    userName: "",
     firstName: "",
     middleNames: [""],
     lastName: "",
@@ -26,7 +26,7 @@ const Register = () => {
 
   const [errors, setErrors] = useState({});
 
-  //  Handle change for both normal and array fields
+  // Handle change for normal & array fields
   const handleChange = (e, index, field) => {
     if (field === "middleNames" || field === "emails") {
       const newValues = [...formData[field]];
@@ -38,12 +38,10 @@ const Register = () => {
     }
   };
 
-  //  Add new field for middle names/emails
   const handleAddField = (field) => {
     setFormData({ ...formData, [field]: [...formData[field], ""] });
   };
 
-  //  Remove field for middle names/emails
   const handleRemoveField = (field, index) => {
     const newValues = [...formData[field]];
     newValues.splice(index, 1);
@@ -53,7 +51,6 @@ const Register = () => {
   // Step 1 validation
   const validateStep1 = () => {
     const newErrors = {};
-    if (!formData.userName.trim()) newErrors.userName = "username is required";
     if (!formData.firstName.trim()) newErrors.firstName = "First name required";
     if (!formData.lastName.trim()) newErrors.lastName = "Last name required";
     if (!formData.role) newErrors.role = "Role is required";
@@ -97,42 +94,49 @@ const Register = () => {
 
     try {
       console.log("Submitting registration data:", formData);
+
+      const headersToSend = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
       const response = await fetch("/api/customers", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData), //  send arrays
+        headers: headersToSend,
+        body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      const text = await response.text();
+      console.log("Raw response:", text);
 
-      // if (response.ok && data.token) {
-      //   // localStorage.setItem("token", data.token);
-      //   console.log("respose received successfully", data);
-      //   login(); // Update auth context
-      //   alert("🎉 Registration complete & Verified!");
-      //   navigate("/");
-      // } else {
-      //   alert(data.message || "Registration failed!");
-      //   console.log("registration failed for some reason ", data);
-      // }
+      let data;
+      try {
+        data = JSON.parse(text); // Try parsing JSON
+      } catch {
+        data = { message: text }; // fallback for non-JSON responses
+      }
+
+      console.log("Parsed response:", data);
+
+      if (response.ok) {
+        alert("🎉 Registration successful!");
+        login(); // update auth context
+        navigate("/");
+      } else {
+        alert(data.message || "Registration failed!");
+      }
     } catch (err) {
-      console.error(err);
-      // alert("Something went wrong. Please try again.");
-      navigate("/");
+      console.error("Error during registration:", err);
+      alert("Something went wrong. Please try again.");
     }
   };
-  // if (response.ok) {
-  //   alert("🎉 Registration complete! Please wait for verification email.");
-  //
-  // }
 
-  // Restrict access: if a customer tries to open register, redirect them
+  // Restrict access
   if (isAuthenticated && userRole === "customer") {
-    navigate("/"); // redirect away
+    navigate("/");
     return null;
   }
 
-  // Role options based on who is logged in
   const roleOptions =
     userRole === "admin"
       ? [
@@ -153,22 +157,8 @@ const Register = () => {
             : "Step 2 - Address Details"}
         </h2>
 
-        {/* Step 1 */}
         {step === 1 && (
           <form className={styles.form} onSubmit={handleNext}>
-            <div className={styles.inputGroup}>
-              <input
-                type="text"
-                name="userName"
-                value={formData.userName}
-                onChange={handleChange}
-                required
-              />
-              <label>userName</label>
-              {errors.userName && (
-                <p className={styles.error}>{errors.userName}</p>
-              )}
-            </div>
             <div className={styles.inputGroup}>
               <input
                 type="text"
@@ -183,7 +173,6 @@ const Register = () => {
               )}
             </div>
 
-            {/*  Multiple Middle Names */}
             {formData.middleNames.map((middle, idx) => (
               <div className={styles.inputGroup} key={idx}>
                 <input
@@ -242,7 +231,6 @@ const Register = () => {
               {errors.role && <p className={styles.error}>{errors.role}</p>}
             </div>
 
-            {/*  Multiple Emails */}
             {formData.emails.map((email, idx) => (
               <div className={styles.inputGroup} key={idx}>
                 <input
@@ -292,7 +280,6 @@ const Register = () => {
           </form>
         )}
 
-        {/* Step 2 */}
         {step === 2 && (
           <form className={styles.form} onSubmit={handleRegister}>
             {["houseNo", "street", "locality", "city", "state", "pinCode"].map(
@@ -325,4 +312,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default RegisterCustomer;

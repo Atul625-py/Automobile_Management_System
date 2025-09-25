@@ -5,10 +5,11 @@ import Home from "./components/Home/Home";
 import Login from "./components/Auth/Login";
 import Register from "./components/Auth/Register";
 import { AuthProvider } from "./components/context/AuthContext";
-import RemoveManager from "./removal/Manager/RemoveManager";
-import RemoveCustomer from "./removal/Customer/RemoveCustomer";
+import RemoveManager from "./components/removal/Manager/RemoveManager";
+import RemoveCustomer from "./components/removal/Customer/RemoveCustomer";
 import Mechanics from "./components/Mechanics/Mechanics";
 import Services from "./components/services/Services";
+import RegisterCustomer from "./components/Auth/RegisterCustomer";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -41,6 +42,10 @@ function App() {
           />
           <Route path="/mechanics" element={<Mechanics></Mechanics>} />
           <Route path="/services" element={<Services></Services>} />
+          <Route
+            path="/add-customer"
+            element={<RegisterCustomer></RegisterCustomer>}
+          />
           <Route
             path="/remove-customer"
             element={<RemoveCustomer></RemoveCustomer>}
