@@ -17,4 +17,5 @@ public class MechanicPhoneId implements Serializable {
 
     @Column(name = "phone_no")
     private String phoneNo;
+
 }

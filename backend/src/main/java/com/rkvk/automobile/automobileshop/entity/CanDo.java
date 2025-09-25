@@ -20,7 +20,7 @@ public class CanDo {
     private CanDoId id;
 
     @ManyToOne
-    @MapsId("mechanicId") // maps composite key mechanicId
+    @MapsId("mechanicId")
     @JoinColumn(name = "mechanic_id", referencedColumnName = "mechanic_id")
     private Mechanic mechanic;
 

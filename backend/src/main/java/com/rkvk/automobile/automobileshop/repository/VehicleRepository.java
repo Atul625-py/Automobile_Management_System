@@ -11,8 +11,6 @@ import java.util.List;
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
-    List<Vehicle> findByRegistrationNo(String registrationNo);
-
-    @Query("SELECT v FROM Vehicle v WHERE v.customer.id = :customerId")
-    List<Vehicle> findByCustomerId(@Param("customerId") Long customerId);
+    List<Vehicle> findByCustomerCustomerId(Long customerId);
+    Vehicle findByRegistrationNo(String registrationNo);
 }

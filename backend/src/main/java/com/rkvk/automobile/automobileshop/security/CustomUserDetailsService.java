@@ -1,8 +1,7 @@
 package com.rkvk.automobile.automobileshop.security;
 
 import com.rkvk.automobile.automobileshop.entity.User;
-import com.rkvk.automobile.automobileshop.entity.UserEmail;
-import com.rkvk.automobile.automobileshop.repository.UserEmailRepository;
+import com.rkvk.automobile.automobileshop.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.*;
@@ -14,22 +13,19 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserEmailRepository userEmailRepository;
+    private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UserEmail ue = userEmailRepository.findByIdEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        // Fetch user by username
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
-        User user = ue.getUser();
-        if (user == null) throw new UsernameNotFoundException("User record not found for email: " + email);
-
-        String role = user.getRole() != null ? user.getRole().name() : "RECEPTIONIST";
-
-        return new org.springframework.security.core.userdetails.User(
-                email,
-                user.getPassword(),
-                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
-        );
+        // Return Spring Security's User object with authorities
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getUsername())
+                .password(user.getPassword()) // ✅ encoded password from DB
+                .authorities(new SimpleGrantedAuthority(user.getRole().name())) // ADMIN or RECEPTIONIST
+                .build();
     }
 }

@@ -19,5 +19,6 @@ public class UserEmail {
      @MapsId("userId")
      @JoinColumn(name = "user_id", referencedColumnName = "user_id")
      private User user;
+
 }
 

@@ -18,5 +18,5 @@ public class VehicleDTO {
     private int year;
     private String fuelType;
 
-    private Long customerId;  // flattened instead of nested CustomerDTO
+    private Long customerId;
 }
