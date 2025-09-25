@@ -3,6 +3,7 @@ package com.rkvk.automobile.automobileshop.service;
 import com.rkvk.automobile.automobileshop.dto.VehicleDTO;
 import com.rkvk.automobile.automobileshop.entity.Customer;
 import com.rkvk.automobile.automobileshop.entity.Vehicle;
+import com.rkvk.automobile.automobileshop.exception.ResourceNotFoundException;
 import com.rkvk.automobile.automobileshop.mapper.VehicleMapper;
 import com.rkvk.automobile.automobileshop.repository.CustomerRepository;
 import com.rkvk.automobile.automobileshop.repository.VehicleRepository;
@@ -20,7 +21,7 @@ public class VehicleService {
 
     public VehicleDTO addVehicle(VehicleDTO dto) {
         Customer customer = customerRepository.findById(dto.getCustomerId())
-                .orElseThrow(() -> new RuntimeException("Customer not found with id: " + dto.getCustomerId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + dto.getCustomerId()));
 
         Vehicle vehicle = VehicleMapper.toEntity(dto, customer);
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
@@ -30,7 +31,7 @@ public class VehicleService {
 
     public VehicleDTO getVehicleById(Long vehicleId) {
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
-                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + vehicleId));
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id: " + vehicleId));
         return VehicleMapper.toDto(vehicle);
     }
 
@@ -43,7 +44,7 @@ public class VehicleService {
 
     public VehicleDTO updateVehicle(Long vehicleId, VehicleDTO dto) {
         Vehicle existingVehicle = vehicleRepository.findById(vehicleId)
-                .orElseThrow(() -> new RuntimeException("Vehicle not found with id: " + vehicleId));
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id: " + vehicleId));
 
         existingVehicle.setRegistrationNo(dto.getRegistrationNo());
         existingVehicle.setBrand(dto.getBrand());
@@ -57,7 +58,7 @@ public class VehicleService {
 
     public void deleteVehicle(Long vehicleId) {
         if (!vehicleRepository.existsById(vehicleId)) {
-            throw new RuntimeException("Vehicle not found with id: " + vehicleId);
+            throw new ResourceNotFoundException("Vehicle not found with id: " + vehicleId);
         }
         vehicleRepository.deleteById(vehicleId);
     }

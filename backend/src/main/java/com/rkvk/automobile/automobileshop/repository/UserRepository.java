@@ -18,7 +18,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByPinCode(String pinCode);
 
     List<User> findByFirstNameOrLastName(String firstName, String lastName);
+
     Optional<User> findByUsername(String username);
+
     boolean existsByUsername(String username);
 
 }

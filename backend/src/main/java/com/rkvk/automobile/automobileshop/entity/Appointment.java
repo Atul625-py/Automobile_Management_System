@@ -33,11 +33,8 @@ public class Appointment {
     @JoinColumn(name = "service_id", referencedColumnName = "service_id", nullable = false)
     private ServiceEntity service;
 
-    @Column(name = "date", nullable = false)
-    private String date;
-
-    @Column(name = "time", nullable = false)
-    private String time;
+    @Column(name = "date_time", nullable = false)
+    private LocalDateTime dateTime;
 
     @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

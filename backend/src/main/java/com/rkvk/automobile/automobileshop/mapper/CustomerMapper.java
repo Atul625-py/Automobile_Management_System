@@ -7,8 +7,6 @@ import com.rkvk.automobile.automobileshop.entity.CustomerMiddleName;
 import com.rkvk.automobile.automobileshop.entity.id.CustomerEmailId;
 import com.rkvk.automobile.automobileshop.entity.id.CustomerMiddleNameId;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
