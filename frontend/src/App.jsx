@@ -7,9 +7,17 @@ import Register from "./components/Auth/Register";
 import { AuthProvider } from "./components/context/AuthContext";
 import RemoveManager from "./components/removal/Manager/RemoveManager";
 import RemoveCustomer from "./components/removal/Customer/RemoveCustomer";
-import Mechanics from "./components/mechanics/Mechanics";
-import Services from "./components/services/Services";
 import RegisterCustomer from "./components/Auth/RegisterCustomer";
+import ServiceAssignment from "./components/services/ServiceAssignment";
+import InventoryPage from "./components/inventory/InventoryPage";
+import MechanicsPage from "./components/mechanics/MechanicsPage";
+import AddMechanic from "./components/mechanics/AddMechanic";
+import ShowCustomers from "./components/removal/Customer/ShowCustomers";
+import CustomerDetail from "./components/removal/Customer/CustomerDetail";
+import ShowManagers from "./components/removal/Manager/ShowManagers";
+import ManagerDetails from "./components/removal/Manager/ManagerDetails";
+
+// 🆕 Newly added components
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -26,6 +34,8 @@ function App() {
 
         <Routes>
           <Route path="/" element={<Home />} />
+
+          {/* Authentication */}
           <Route
             path="/login"
             element={
@@ -40,21 +50,44 @@ function App() {
             path="/register"
             element={!isLoggedIn ? <Register /> : <Navigate to="/" />}
           />
-          <Route path="/mechanics" element={<Mechanics></Mechanics>} />
-          <Route path="/services" element={<Services></Services>} />
+
+          {/* Mechanics */}
+          <Route path="/mechanics" element={<MechanicsPage />} />
+          <Route path="/addmechanic" element={<AddMechanic />} />
+
+          {/* Services */}
+          <Route path="/add-services" element={<ServiceAssignment />} />
+
+          {/* Customers */}
+          <Route path="/add-customer" element={<RegisterCustomer />} />
+          <Route path="/remove-customer" element={<RemoveCustomer />} />
+
+          {/* Admin Features */}
+          <Route path="/inventory" element={<InventoryPage />} />
+          <Route path="/remove-manager" element={<RemoveManager />} />
+
+          {/* 🆕 New Routes for Viewing */}
           <Route
-            path="/add-customer"
-            element={<RegisterCustomer></RegisterCustomer>}
+            path="/show-customers"
+            element={<ShowCustomers></ShowCustomers>}
+          />
+          {/* <Route
+            path="/show-managers"
+            element={<ShowM}
+          /> */}
+          <Route
+            path="/customer/:id"
+            element={<CustomerDetail></CustomerDetail>}
           />
           <Route
-            path="/remove-customer"
-            element={<RemoveCustomer></RemoveCustomer>}
+            path="/show-managers"
+            element={<ShowManagers></ShowManagers>}
           />
           <Route
-            path="/remove-manager"
-            element={<RemoveManager></RemoveManager>}
+            path="/manager/:id"
+            element={<ManagerDetails></ManagerDetails>}
           />
-          {/* Redirect unknown paths to home */}
+          {/* Redirect unknown paths */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
