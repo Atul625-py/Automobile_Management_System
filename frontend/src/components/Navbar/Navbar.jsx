@@ -1,3 +1,4 @@
+// src/components/Navbar.jsx
 import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import { CgProfile } from "react-icons/cg";
@@ -30,13 +31,21 @@ const Navbar = () => {
           {isVerified && <span className={styles.verifiedTick}>✅</span>}
           {showMenu && (
             <div className={styles.dropdown}>
-              {userRole === "manager" && (
-                <Link to="/remove-customer" className={styles.dropdownItem}>
-                  Remove Customer
-                </Link>
+              {/* Manager / Admin Options */}
+              {(userRole === "manager" || userRole === "admin") && (
+                <>
+                  <Link to="/show-customers" className={styles.dropdownItem}>
+                    Show Customers
+                  </Link>
+                </>
               )}
+
+              {/* Admin-only options */}
               {userRole === "admin" && (
                 <>
+                  <Link to="/show-managers" className={styles.dropdownItem}>
+                    Show Managers
+                  </Link>
                   <Link to="/remove-customer" className={styles.dropdownItem}>
                     Remove Customer
                   </Link>
@@ -61,20 +70,29 @@ const Navbar = () => {
         )}
 
         {(userRole === "manager" || userRole === "admin") && (
-          <Link to="/add-customer" className={styles.navLink}>
-            Add Customer
-          </Link>
+          <>
+            <Link to="/add-customer" className={styles.navLink}>
+              Add Customer
+            </Link>
+          </>
         )}
+
         {userRole === "admin" && (
-          <Link to="/register" className={styles.navLink}>
-            Add User
-          </Link>
+          <>
+            <Link to="/register" className={styles.navLink}>
+              Add User
+            </Link>
+            <Link to="/inventory" className={styles.navLink}>
+              Inventory
+            </Link>
+          </>
         )}
+
         <Link to="/mechanics" className={styles.navLink}>
           Mechanics
         </Link>
-        <Link to="/services" className={styles.navLink}>
-          Services
+        <Link to="/add-services" className={styles.navLink}>
+          Add Service
         </Link>
       </div>
     </nav>

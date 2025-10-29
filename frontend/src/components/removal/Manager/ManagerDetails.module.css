@@ -1,0 +1,27 @@
+.container {
+  width: 60%;
+  margin: 40px auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  color: #111827;
+  margin-bottom: 20px;
+}
+
+.detailsCard {
+  line-height: 1.8;
+  font-size: 16px;
+  color: #333;
+}
+
+.loading,
+.error {
+  text-align: center;
+  color: #666;
+  margin-top: 50px;
+}
