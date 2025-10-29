@@ -1,0 +1,35 @@
+.container {
+  padding: 2rem;
+  text-align: center;
+}
+
+.heading {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+}
+
+.card:hover {
+  background: #eef;
+  transform: translateY(-3px);
+}
+
+.loading {
+  text-align: center;
+  margin-top: 2rem;
+  color: #555;
+}
