@@ -31,4 +31,5 @@ public class Inventory {
 
     @OneToMany(mappedBy = "part")
     private Set<Uses> usedInInvoices = new HashSet<>();
+
 }

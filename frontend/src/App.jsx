@@ -7,7 +7,7 @@ import Register from "./components/Auth/Register";
 import { AuthProvider } from "./components/context/AuthContext";
 import RemoveManager from "./components/removal/Manager/RemoveManager";
 import RemoveCustomer from "./components/removal/Customer/RemoveCustomer";
-import Mechanics from "./components/Mechanics/Mechanics";
+import Mechanics from "./components/mechanics/Mechanics";
 import Services from "./components/services/Services";
 import RegisterCustomer from "./components/Auth/RegisterCustomer";
 
