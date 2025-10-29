@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/invoices")
 @RequiredArgsConstructor
@@ -63,4 +65,38 @@ public class InvoiceController {
         invoiceService.deleteInvoice(invoiceId);
         return ResponseEntity.ok("Invoice deleted");
     }
+
+    // Get all invoices (service record) for a customer (all vehicles)
+    @GetMapping("/customers/{customerId}")
+    @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
+    public ResponseEntity<List<InvoiceDTO>> getInvoicesForCustomer(@PathVariable Long customerId) {
+        List<InvoiceDTO> dtos = invoiceService.getInvoicesForCustomer(customerId);
+        return ResponseEntity.ok(dtos);
+    }
+
+    // Get all invoices (service record) for a vehicle
+    @GetMapping("/vehicles/{vehicleId}")
+    @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
+    public ResponseEntity<List<InvoiceDTO>> getInvoicesForVehicle(@PathVariable Long vehicleId) {
+        List<InvoiceDTO> dtos = invoiceService.getInvoicesForVehicle(vehicleId);
+        return ResponseEntity.ok(dtos);
+    }
+
+    /**
+     * Update an existing invoice (tax, labour and usedParts allowed).
+     * Both ADMIN and RECEPTIONIST can update invoices.
+     *
+     * PUT /api/invoices/{invoiceId}
+     * body: InvoiceDTO (usedParts will be reconciled against existing uses; inventory adjusted accordingly)
+     */
+    @PutMapping("/{invoiceId}")
+    @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
+    public ResponseEntity<InvoiceDTO> updateInvoice(
+            @PathVariable Long invoiceId,
+            @RequestBody InvoiceDTO invoiceDTO) {
+
+        InvoiceDTO updated = invoiceService.updateInvoice(invoiceId, invoiceDTO);
+        return ResponseEntity.ok(updated);
+    }
+
 }
