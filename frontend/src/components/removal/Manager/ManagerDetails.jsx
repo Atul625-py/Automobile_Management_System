@@ -4,7 +4,7 @@ import styles from "./ManagerDetails.module.css";
 
 const ManagerDetails = () => {
   const { id } = useParams();
-  const [manager, setManager] = useState(null);
+  const [RECEPTIONIST, setManager] = useState(null);
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
 
@@ -17,11 +17,12 @@ const ManagerDetails = () => {
             "Content-Type": "application/json",
           },
         });
-        if (!response.ok) throw new Error("Failed to fetch manager details");
+        if (!response.ok)
+          throw new Error("Failed to fetch RECEPTIONIST details");
         const data = await response.json();
         setManager(data);
       } catch (error) {
-        console.error("Error fetching manager details:", error);
+        console.error("Error fetching RECEPTIONIST details:", error);
       } finally {
         setLoading(false);
       }
@@ -30,28 +31,31 @@ const ManagerDetails = () => {
   }, [id, token]);
 
   if (loading)
-    return <div className={styles.loading}>Loading manager details...</div>;
+    return (
+      <div className={styles.loading}>Loading RECEPTIONIST details...</div>
+    );
 
-  if (!manager) return <div className={styles.error}>Manager not found.</div>;
+  if (!RECEPTIONIST)
+    return <div className={styles.error}>RECEPTIONIST not found.</div>;
 
   return (
     <div className={styles.container}>
-      <h2>Manager Details</h2>
+      <h2>RECEPTIONIST Details</h2>
       <div className={styles.detailsCard}>
         <p>
-          <strong>Username:</strong> {manager.username}
+          <strong>Username:</strong> {RECEPTIONIST.username}
         </p>
         <p>
-          <strong>Email:</strong> {manager.email}
+          <strong>Email:</strong> {RECEPTIONIST.email}
         </p>
         <p>
-          <strong>Phone:</strong> {manager.phone || "Not provided"}
+          <strong>Phone:</strong> {RECEPTIONIST.phone || "Not provided"}
         </p>
         <p>
-          <strong>Role:</strong> {manager.role}
+          <strong>Role:</strong> {RECEPTIONIST.role}
         </p>
         <p>
-          <strong>Address:</strong> {manager.address || "N/A"}
+          <strong>Address:</strong> {RECEPTIONIST.address || "N/A"}
         </p>
       </div>
     </div>

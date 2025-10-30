@@ -39,13 +39,13 @@ const ShowManagers = () => {
         {managers.length === 0 ? (
           <p className={styles.empty}>No managers found.</p>
         ) : (
-          managers.map((manager) => (
-            <div key={manager.id} className={styles.managerCard}>
-              <h3>{manager.username}</h3>
-              <p>{manager.email}</p>
+          managers.map((RECEPTIONIST) => (
+            <div key={RECEPTIONIST.id} className={styles.managerCard}>
+              <h3>{RECEPTIONIST.username}</h3>
+              <p>{RECEPTIONIST.email}</p>
               <button
                 className={styles.detailsBtn}
-                onClick={() => navigate(`/manager/${manager.id}`)}
+                onClick={() => navigate(`/RECEPTIONIST/${RECEPTIONIST.id}`)}
               >
                 View Details
               </button>
