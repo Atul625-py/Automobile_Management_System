@@ -1,0 +1,93 @@
+.container {
+  padding: 30px;
+}
+
+.heading {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.filterRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 25px;
+  gap: 10px;
+}
+
+.label {
+  font-weight: 500;
+}
+
+.select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+.loading {
+  text-align: center;
+  color: gray;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+}
+
+.table th {
+  background-color: #f4f4f4;
+  font-weight: 600;
+}
+
+.noData {
+  text-align: center;
+  color: gray;
+}
+
+.editBtn,
+.invoiceBtn {
+  margin: 0 5px;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+}
+
+.editBtn {
+  background-color: #007bff;
+}
+
+.invoiceBtn {
+  background-color: #28a745;
+}
+
+.statusDropdown {
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* Status Colors */
+.booked {
+  background-color: #fff3cd;
+}
+.ongoing {
+  background-color: #cce5ff;
+}
+.completed {
+  background-color: #d4edda;
+}
+.cancelled {
+  background-color: #f8d7da;
+}
