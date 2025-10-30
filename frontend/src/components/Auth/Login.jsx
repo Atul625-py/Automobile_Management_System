@@ -24,15 +24,16 @@ const Login = ({ onLogin }) => {
 
       const data = await response.json();
       console.log(data);
+      // console.log()
       if (!response.ok) {
         throw new Error("Invalid username or password");
       }
 
       // Save token in localStorage
       localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role || "manager");
+      localStorage.setItem("role", data.role || "admin");
 
-      console.log("User role set to:", data.role);
+      console.log("User role set to:", localStorage.getItem("role"));
 
       // Update login state in parent (Navbar/App)
       onLogin(true);
