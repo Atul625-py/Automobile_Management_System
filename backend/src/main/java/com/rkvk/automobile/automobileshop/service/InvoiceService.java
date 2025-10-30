@@ -30,7 +30,7 @@ public class InvoiceService {
      * If invoice doesn't exist for that appointment, create it.
      * Decrease inventory and create/update Uses row.
      *
-     * Roles: controller will guard via @PreAuthorize (both ADMIN & receptionist can use parts).
+     * Roles: controller will guard via @PreAuthorize (both admin & receptionist can use parts).
      */
     @Transactional
     public Invoice addPartToInvoice(Long appointmentId, Long partId, int count) {

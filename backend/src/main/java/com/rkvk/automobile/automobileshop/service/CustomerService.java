@@ -24,20 +24,26 @@ public class CustomerService {
     private final CustomerEmailRepository emailRepository;
     private final CustomerMapper customerMapper;
 
-    // Add Customer with middle names & emails
-    public Customer addCustomer(CustomerDTO dto) {
+    // Add Customer and return DTO (includes generated customerId)
+    public CustomerDTO addCustomer(CustomerDTO dto) {
         Customer customer = customerMapper.dtoToEntity(dto);
         Customer savedCustomer = customerRepository.save(customer);
 
         saveMiddleNamesAndEmails(savedCustomer, dto);
 
-        return savedCustomer;
+        // Map back to DTO for response
+        CustomerDTO savedDto = customerMapper.entityToDto(savedCustomer);
+        savedDto.setMiddleNames(dto.getMiddleNames());
+        savedDto.setEmails(dto.getEmails());
+        return savedDto;
     }
 
-    public Customer updateCustomer(Long id, CustomerDTO dto) {
+    // Update existing customer and return DTO
+    public CustomerDTO updateCustomer(Long id, CustomerDTO dto) {
         Customer existingCustomer = customerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
 
+        // Update main fields
         existingCustomer.setFirstName(dto.getFirstName());
         existingCustomer.setLastName(dto.getLastName());
         existingCustomer.setHouseNo(dto.getHouseNo());
@@ -58,9 +64,14 @@ public class CustomerService {
 
         saveMiddleNamesAndEmails(savedCustomer, dto);
 
-        return savedCustomer;
+        // Return DTO with ID and updated info
+        CustomerDTO savedDto = customerMapper.entityToDto(savedCustomer);
+        savedDto.setMiddleNames(dto.getMiddleNames());
+        savedDto.setEmails(dto.getEmails());
+        return savedDto;
     }
 
+    // Get single customer by ID
     public CustomerDTO getCustomerById(Long id) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
@@ -82,6 +93,7 @@ public class CustomerService {
         return dto;
     }
 
+    // Get all customers (list of DTOs)
     public List<CustomerDTO> getAllCustomers() {
         List<Customer> customers = customerRepository.findAll();
 
@@ -106,13 +118,14 @@ public class CustomerService {
         }).toList();
     }
 
+    // Delete customer safely
     public void deleteCustomer(Long id) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Customer not found with id: " + id));
         customerRepository.delete(customer);
     }
 
-
+    // Private helper to save middle names and emails
     private void saveMiddleNamesAndEmails(Customer customer, CustomerDTO dto) {
         if (dto.getMiddleNames() != null) {
             int order = 1;

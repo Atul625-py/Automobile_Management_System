@@ -1,7 +1,6 @@
 package com.rkvk.automobile.automobileshop.controller;
 
 import com.rkvk.automobile.automobileshop.dto.CustomerDTO;
-import com.rkvk.automobile.automobileshop.entity.Customer;
 import com.rkvk.automobile.automobileshop.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,7 +17,7 @@ public class CustomerController {
 
     @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
     @PostMapping
-    public Customer addCustomer(@RequestBody CustomerDTO dto) {
+    public CustomerDTO addCustomer(@RequestBody CustomerDTO dto) {
         return customerService.addCustomer(dto);
     }
 
@@ -36,7 +35,7 @@ public class CustomerController {
 
     @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
     @PutMapping("/{id}")
-    public Customer updateCustomer(@PathVariable Long id, @RequestBody CustomerDTO dto) {
+    public CustomerDTO updateCustomer(@PathVariable Long id, @RequestBody CustomerDTO dto) {
         return customerService.updateCustomer(id, dto);
     }
 

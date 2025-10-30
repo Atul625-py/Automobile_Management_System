@@ -7,6 +7,7 @@ import com.rkvk.automobile.automobileshop.entity.CustomerMiddleName;
 import com.rkvk.automobile.automobileshop.entity.id.CustomerEmailId;
 import com.rkvk.automobile.automobileshop.entity.id.CustomerMiddleNameId;
 import org.springframework.stereotype.Component;
+
 import java.util.stream.Collectors;
 
 @Component
@@ -18,6 +19,7 @@ public class CustomerMapper {
         }
 
         Customer customer = Customer.builder()
+                .customerId(dto.getCustomerId()) // Include ID if available (for update)
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
                 .houseNo(dto.getHouseNo())
@@ -31,20 +33,19 @@ public class CustomerMapper {
             customer.setMiddleNames(
                     dto.getMiddleNames().stream()
                             .map(m -> CustomerMiddleName.builder()
-                                    .id(new CustomerMiddleNameId(customer.getCustomerId(), m)) // FK set later
-                                    .middleNameOrder(0) // order can be set in service
+                                    .id(new CustomerMiddleNameId(customer.getCustomerId(), m))
+                                    .middleNameOrder(0)
                                     .customer(customer)
                                     .build()
                             ).collect(Collectors.toList())
             );
         }
 
-        // emails -> entities
         if (dto.getEmails() != null) {
             customer.setEmails(
                     dto.getEmails().stream()
                             .map(e -> CustomerEmail.builder()
-                                    .id(new CustomerEmailId(customer.getCustomerId(), e)) // FK set later
+                                    .id(new CustomerEmailId(customer.getCustomerId(), e))
                                     .customer(customer)
                                     .build()
                             ).collect(Collectors.toList())
@@ -54,13 +55,13 @@ public class CustomerMapper {
         return customer;
     }
 
-    // Entity -> DTO
     public CustomerDTO entityToDto(Customer customer) {
         if (customer == null) {
             return null;
         }
 
         CustomerDTO dto = new CustomerDTO();
+        dto.setCustomerId(customer.getCustomerId()); // Map ID back
         dto.setFirstName(customer.getFirstName());
         dto.setLastName(customer.getLastName());
         dto.setHouseNo(customer.getHouseNo());
@@ -69,7 +70,6 @@ public class CustomerMapper {
         dto.setCity(customer.getCity());
         dto.setPinCode(customer.getPinCode());
 
-        // middle names -> list of strings
         if (customer.getMiddleNames() != null) {
             dto.setMiddleNames(
                     customer.getMiddleNames().stream()
@@ -78,7 +78,6 @@ public class CustomerMapper {
             );
         }
 
-        // emails -> list of strings
         if (customer.getEmails() != null) {
             dto.setEmails(
                     customer.getEmails().stream()
