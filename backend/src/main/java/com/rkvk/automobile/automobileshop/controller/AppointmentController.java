@@ -101,4 +101,32 @@ public class AppointmentController {
         appointmentService.deleteAppointment(id);
         return ResponseEntity.ok("Appointment deleted successfully");
     }
+    // FILTER by status
+    @GetMapping("/status/{status}")
+    @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
+    public ResponseEntity<List<AppointmentDTO>> getByStatus(@PathVariable Appointment.AppointmentStatus status) {
+        List<AppointmentDTO> list = appointmentService.getAppointmentsByStatus(status)
+                .stream().map(AppointmentMapper::toDTO).toList();
+        return ResponseEntity.ok(list);
+    }
+
+    // FILTER by user and status
+    @GetMapping("/user/{userId}/status/{status}")
+    @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
+    public ResponseEntity<List<AppointmentDTO>> getByUserAndStatus(@PathVariable Long userId,
+                                                                   @PathVariable Appointment.AppointmentStatus status) {
+        List<AppointmentDTO> list = appointmentService.getAppointmentsByUserAndStatus(userId, status)
+                .stream().map(AppointmentMapper::toDTO).toList();
+        return ResponseEntity.ok(list);
+    }
+
+    // UPDATE appointment status
+    @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
+    public ResponseEntity<AppointmentDTO> updateStatus(@PathVariable Long id,
+                                                       @RequestParam Appointment.AppointmentStatus status) {
+        Appointment updated = appointmentService.updateAppointmentStatus(id, status);
+        return ResponseEntity.ok(AppointmentMapper.toDTO(updated));
+    }
+
 }

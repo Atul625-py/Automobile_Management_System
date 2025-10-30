@@ -1,5 +1,6 @@
 package com.rkvk.automobile.automobileshop.dto;
 
+import com.rkvk.automobile.automobileshop.entity.Appointment.AppointmentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,4 +21,6 @@ public class AppointmentDTO {
 
     private LocalDateTime dateTime;
     private LocalDateTime createdAt;
+
+    private AppointmentStatus status;
 }

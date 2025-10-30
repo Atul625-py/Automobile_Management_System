@@ -69,4 +69,19 @@ public class AppointmentService {
         }
         appointmentRepository.deleteById(id);
     }
+    public List<Appointment> getAppointmentsByStatus(Appointment.AppointmentStatus status) {
+        return appointmentRepository.findByStatus(status);
+    }
+
+    public List<Appointment> getAppointmentsByUserAndStatus(Long userId, Appointment.AppointmentStatus status) {
+        return appointmentRepository.findByUser_UserIdAndStatus(userId, status);
+    }
+
+    public Appointment updateAppointmentStatus(Long id, Appointment.AppointmentStatus newStatus) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        appointment.setStatus(newStatus);
+        return appointmentRepository.save(appointment);
+    }
+
 }

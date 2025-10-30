@@ -19,6 +19,7 @@ public class AppointmentMapper {
                 .serviceId(entity.getService() != null ? entity.getService().getServiceId() : null)
                 .dateTime(entity.getDateTime())
                 .createdAt(entity.getCreatedAt())
+                .status(entity.getStatus())
                 .build();
     }
 
@@ -32,6 +33,7 @@ public class AppointmentMapper {
                 .service(service)
                 .dateTime(dto.getDateTime())
                 .createdAt(dto.getCreatedAt() != null ? dto.getCreatedAt() : LocalDateTime.now())
+                .status(dto.getStatus() != null ? dto.getStatus() : Appointment.AppointmentStatus.BOOKED)
                 .build();
     }
 }

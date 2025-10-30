@@ -1,11 +1,7 @@
 package com.rkvk.automobile.automobileshop.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -38,4 +34,15 @@ public class Appointment {
 
     @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private AppointmentStatus status = AppointmentStatus.BOOKED; // default
+
+    public enum AppointmentStatus {
+        BOOKED,
+        ONGOING,
+        COMPLETED,
+        CANCELLED
+    }
 }
