@@ -26,7 +26,7 @@ It demonstrates: - Database schema design and normalization.
 | ---------------------------- | ----------------------------- | ------------ | --------------------------------------------------------- |
 | ⭐ **Team Leader & Backend** | **Atul Kumar Pandey**         | **23074006** | [Atul625-py](https://github.com/Atul625-py)               |
 | 🤝 **Co-Leader & Backend**   | Thakkarwad Basweshwar Pradeep | 23074030     | [bt666-1](https://github.com/bt666-1)                     |
-| 🎨 **Frontend Engineer**     | Purushottam Lal               | 23075061     | [Purushottam620xyz](https://github.com/Purushottam620xyz) |
+| 🎨 **Frontend Engineer**     | Purushottam Lal               | 23075061     | [purushottam62](https://github.com/purushottam62) |
 | 🖌️ **Frontend Designer**     | Chukka Chamantej              | 23074010     | [chukkachaman](https://github.com/chukkachaman)           |
 
 ---
