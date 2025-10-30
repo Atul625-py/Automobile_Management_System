@@ -1,20 +1,21 @@
 import React, { useEffect, useState, useContext } from "react";
 import styles from "./InventoryPage.module.css";
 import { AuthContext } from "../context/AuthContext";
-import { Trash2, Save } from "lucide-react";
+import { Trash2, PlusCircle, MinusCircle } from "lucide-react";
 
 const InventoryPage = () => {
   const { userRole } = useContext(AuthContext);
   const token = localStorage.getItem("token");
+
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newItem, setNewItem] = useState({
     name: "",
-    description: "",
-    quantity: "",
+    quantityAvailable: "",
+    unitPrice: "",
   });
 
-  const [editQuantities, setEditQuantities] = useState({}); // store editable quantities
+  const [adjustQuantities, setAdjustQuantities] = useState({}); // store per-item adjustment values
 
   // ✅ Fetch all inventory
   const fetchInventory = async () => {
@@ -26,12 +27,10 @@ const InventoryPage = () => {
       const data = await res.json();
       setInventory(data);
 
-      // initialize editable values
-      const initial = {};
-      data.forEach((item) => {
-        initial[item.partId] = item.quantityAvailable;
-      });
-      setEditQuantities(initial);
+      // initialize adjustments as empty
+      const init = {};
+      data.forEach((i) => (init[i.partId] = ""));
+      setAdjustQuantities(init);
     } catch (err) {
       console.error("Error fetching inventory:", err);
     } finally {
@@ -43,7 +42,7 @@ const InventoryPage = () => {
     fetchInventory();
   }, []);
 
-  // ✅ Add new inventory item (ADMIN only)
+  // ✅ Add new item
   const handleAddItem = async (e) => {
     e.preventDefault();
     try {
@@ -56,7 +55,8 @@ const InventoryPage = () => {
         body: JSON.stringify(newItem),
       });
       if (!res.ok) throw new Error("Failed to add item");
-      setNewItem({ name: "", description: "", quantity: "" });
+      alert("✅ Item added successfully!");
+      setNewItem({ name: "", quantityAvailable: "", unitPrice: "" });
       fetchInventory();
     } catch (err) {
       console.error(err);
@@ -64,32 +64,35 @@ const InventoryPage = () => {
     }
   };
 
-  // ✅ Update stock directly with new value
-  const handleUpdateQuantity = async (partId) => {
-    const newQuantity = parseInt(editQuantities[partId], 10);
-    if (isNaN(newQuantity) || newQuantity < 0) {
-      alert("Please enter a valid quantity");
+  // ✅ Increase / Decrease stock
+  const updateStock = async (partId, type) => {
+    const qty = adjustQuantities[partId];
+    if (!qty || isNaN(qty) || qty <= 0) {
+      alert("Enter a valid quantity");
       return;
     }
 
+    const endpoint =
+      type === "increase"
+        ? `/api/inventory/${partId}/increase?quantity=${qty}`
+        : `/api/inventory/${partId}/decrease?quantity=${qty}`;
+
     try {
-      const res = await fetch(`/api/inventory/${partId}/set_quantity`, {
+      const res = await fetch(endpoint, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ quantity: newQuantity }),
+        headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("Failed to update quantity");
+      if (!res.ok) throw new Error("Failed to update stock");
       fetchInventory();
+      // reset this item’s adjust field
+      setAdjustQuantities((prev) => ({ ...prev, [partId]: "" }));
     } catch (err) {
       console.error(err);
-      alert("❌ Failed to update quantity");
+      alert(`❌ Failed to ${type} stock`);
     }
   };
 
-  // ✅ Delete item (ADMIN only)
+  // ✅ Delete item
   const handleDelete = async (partId) => {
     if (!window.confirm("Are you sure you want to delete this item?")) return;
     try {
@@ -111,33 +114,33 @@ const InventoryPage = () => {
     <div className={styles.container}>
       <h1 className={styles.heading}>🧾 Inventory Management</h1>
 
-      {/* ✅ ADMIN can add items */}
+      {/* ✅ Add Section */}
       {userRole === "ADMIN" && (
         <section className={styles.addSection}>
-          <h2>Add New Item</h2>
+          <h2>Add New Inventory Item</h2>
           <form onSubmit={handleAddItem} className={styles.form}>
             <input
               type="text"
-              placeholder="Item Name"
+              placeholder="Part Name"
               value={newItem.name}
               onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
               required
             />
             <input
-              type="text"
-              placeholder="Description"
-              value={newItem.description}
+              type="number"
+              placeholder="Initial Quantity"
+              value={newItem.quantityAvailable}
               onChange={(e) =>
-                setNewItem({ ...newItem, description: e.target.value })
+                setNewItem({ ...newItem, quantityAvailable: e.target.value })
               }
               required
             />
             <input
               type="number"
-              placeholder="Quantity"
-              value={newItem.quantity}
+              placeholder="Unit Price (₹)"
+              value={newItem.unitPrice}
               onChange={(e) =>
-                setNewItem({ ...newItem, quantity: e.target.value })
+                setNewItem({ ...newItem, unitPrice: e.target.value })
               }
               required
             />
@@ -146,7 +149,7 @@ const InventoryPage = () => {
         </section>
       )}
 
-      {/* ✅ Inventory Table */}
+      {/* ✅ Table */}
       <section className={styles.inventoryList}>
         <h2>Current Inventory</h2>
         {inventory.length === 0 ? (
@@ -159,6 +162,7 @@ const InventoryPage = () => {
                 <th>Part Name</th>
                 <th>Quantity</th>
                 <th>Unit Price (₹)</th>
+                {userRole === "ADMIN" && <th>Adjust Stock</th>}
                 {userRole === "ADMIN" && <th>Actions</th>}
               </tr>
             </thead>
@@ -167,46 +171,53 @@ const InventoryPage = () => {
                 <tr key={item.partId}>
                   <td>{item.partId}</td>
                   <td>{item.name}</td>
-
-                  {/* ✅ Editable quantity input */}
-                  <td>
-                    <div className={styles.quantityEdit}>
-                      <input
-                        type="number"
-                        value={editQuantities[item.partId] || ""}
-                        onChange={(e) =>
-                          setEditQuantities({
-                            ...editQuantities,
-                            [item.partId]: e.target.value,
-                          })
-                        }
-                        className={styles.quantityInput}
-                      />
-                      {userRole === "ADMIN" && (
-                        <button
-                          className={styles.saveBtn}
-                          onClick={() => handleUpdateQuantity(item.partId)}
-                          title="Save quantity"
-                        >
-                          <Save size={16} />
-                        </button>
-                      )}
-                    </div>
-                  </td>
-
+                  <td>{item.quantityAvailable}</td>
                   <td>{item.unitPrice}</td>
 
-                  {/* ✅ Delete button for ADMIN */}
                   {userRole === "ADMIN" && (
-                    <td>
-                      <button
-                        onClick={() => handleDelete(item.partId)}
-                        className={styles.deleteBtn}
-                        title="Delete item"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </td>
+                    <>
+                      <td className={styles.adjustCell}>
+                        <input
+                          type="number"
+                          min="1"
+                          placeholder="Qty"
+                          value={adjustQuantities[item.partId] ?? ""}
+                          onChange={(e) =>
+                            setAdjustQuantities({
+                              ...adjustQuantities,
+                              [item.partId]: e.target.value,
+                            })
+                          }
+                          className={styles.adjustInput}
+                        />
+                        <div className={styles.adjustButtons}>
+                          <button
+                            onClick={() => updateStock(item.partId, "increase")}
+                            className={styles.increaseBtn}
+                            title="Add Stock"
+                          >
+                            <PlusCircle size={18} />
+                          </button>
+                          <button
+                            onClick={() => updateStock(item.partId, "decrease")}
+                            className={styles.decreaseBtn}
+                            title="Remove Stock"
+                          >
+                            <MinusCircle size={18} />
+                          </button>
+                        </div>
+                      </td>
+
+                      <td>
+                        <button
+                          onClick={() => handleDelete(item.partId)}
+                          className={styles.deleteBtn}
+                          title="Delete Item"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </td>
+                    </>
                   )}
                 </tr>
               ))}

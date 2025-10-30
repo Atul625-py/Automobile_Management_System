@@ -170,3 +170,53 @@
 .saveBtn:hover {
   background: #43a047;
 }
+
+.adjustCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.adjustInput {
+  width: 60px;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 15px;
+}
+
+.adjustButtons {
+  display: flex;
+  gap: 6px;
+}
+
+.increaseBtn,
+.decreaseBtn {
+  border: none;
+  border-radius: 6px;
+  padding: 5px 7px;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out, transform 0.1s;
+}
+
+.increaseBtn {
+  background: #d4f4d2;
+  color: #2e7d32;
+}
+
+.increaseBtn:hover {
+  background: #b8ecb2;
+  transform: scale(1.05);
+}
+
+.decreaseBtn {
+  background: #fbe2e2;
+  color: #c62828;
+}
+
+.decreaseBtn:hover {
+  background: #f8c6c6;
+  transform: scale(1.05);
+}
