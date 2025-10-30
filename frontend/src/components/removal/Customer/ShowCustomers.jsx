@@ -37,11 +37,11 @@ const ShowCustomers = () => {
         <p className={styles.noData}>No customers found.</p>
       ) : (
         <div className={styles.cardGrid}>
-          {customers.map((c, index) => (
+          {customers.map((c) => (
             <div
-              key={c.email || c.phone || index} // ✅ unique key fallback
+              key={c.customerId}
               className={styles.card}
-              onClick={() => navigate(`/customer/${c.id || index}`)} // safe fallback
+              onClick={() => navigate(`/customer/${c.customerId}`)}
             >
               <h2>
                 {c.firstName} {c.lastName}

@@ -4,27 +4,23 @@ import styles from "./ServiceAssignment.module.css";
 
 const ServiceAssignment = () => {
   const [customers, setCustomers] = useState([]);
-  const [mechanics, setMechanics] = useState([]);
   const [services, setServices] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
   const [formData, setFormData] = useState({
-    userId: "",
+    customerId: "",
     vehicleId: "",
     serviceId: "",
-    mechanicId: "",
     dateTime: "",
   });
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
 
-  // Fetch all required data once
+  // Fetch customers & services initially
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchInitial = async () => {
       try {
-        const [usersRes, mechanicsRes, servicesRes] = await Promise.all([
-          fetch("/api/users", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch("/api/mechanics", {
+        const [customersRes, servicesRes] = await Promise.all([
+          fetch("/api/customers", {
             headers: { Authorization: `Bearer ${token}` },
           }),
           fetch("/api/services", {
@@ -32,65 +28,117 @@ const ServiceAssignment = () => {
           }),
         ]);
 
-        if (!usersRes.ok || !mechanicsRes.ok || !servicesRes.ok)
+        if (!customersRes.ok || !servicesRes.ok)
           throw new Error("Failed to load dropdown data");
 
-        const [usersData, mechanicsData, servicesData] = await Promise.all([
-          usersRes.json(),
-          mechanicsRes.json(),
+        const [customersData, servicesData] = await Promise.all([
+          customersRes.json(),
           servicesRes.json(),
         ]);
 
-        setCustomers(usersData);
-        setMechanics(mechanicsData);
+        // normalize: prefer numeric ids customer.customerId or customer.id
+        setCustomers(customersData);
         setServices(servicesData);
       } catch (err) {
-        console.error("Error fetching data:", err);
-        alert("❌ Failed to load data. Please check backend APIs.");
+        console.error("Error fetching initial dropdowns:", err);
+        alert("❌ Failed to load customers/services. Check backend.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
+    fetchInitial();
   }, [token]);
 
-  // Handle form input changes
+  // When customer changes, fetch vehicles for that customer id
+  useEffect(() => {
+    const { customerId } = formData;
+    if (!customerId) {
+      setVehicles([]);
+      return;
+    }
+
+    const fetchVehicles = async () => {
+      try {
+        // ensure it's the numeric id only
+        const id = Number(customerId);
+        if (!id) throw new Error("Invalid customer id");
+
+        const res = await fetch(`/api/vehicles/customer/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok)
+          throw new Error("Failed to fetch vehicles for this customer");
+        const data = await res.json();
+        setVehicles(data);
+      } catch (err) {
+        console.error("Error fetching vehicles:", err);
+        setVehicles([]);
+        alert("❌ Could not fetch vehicles for selected customer");
+      }
+    };
+
+    fetchVehicles();
+  }, [formData.customerId, token]);
+
+  // handle input
   const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setFormData((p) => ({ ...p, [name]: value }));
+    // if customer changed, clear selected vehicle
+    if (name === "customerId") setFormData((p) => ({ ...p, vehicleId: "" }));
   };
 
-  // Handle form submission
+  // submit appointment
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!formData.customerId) {
+      alert("Please select a customer first.");
+      return;
+    }
+    if (!formData.vehicleId) {
+      alert("Please select a vehicle.");
+      return;
+    }
+    if (!formData.serviceId) {
+      alert("Please select a service.");
+      return;
+    }
+    if (!formData.dateTime) {
+      alert("Please select appointment date & time.");
+      return;
+    }
+
     try {
-      const response = await fetch("/api/appointments", {
+      const body = {
+        userId: Number(formData.customerId), // send customer id as userId (DTO expects userId)
+        vehicleId: Number(formData.vehicleId),
+        serviceId: Number(formData.serviceId),
+        dateTime: formData.dateTime,
+      };
+
+      const res = await fetch("/api/appointments", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          userId: formData.userId,
-          vehicleId: formData.vehicleId,
-          serviceId: formData.serviceId,
-          mechanicId: formData.mechanicId,
-          dateTime: formData.dateTime,
-        }),
+        body: JSON.stringify(body),
       });
 
-      if (response.ok) {
+      if (res.ok) {
         alert("✅ Appointment created successfully!");
         setFormData({
-          userId: "",
+          customerId: "",
           vehicleId: "",
           serviceId: "",
-          mechanicId: "",
           dateTime: "",
         });
+        setVehicles([]);
       } else {
-        const errData = await response.json();
+        const errData = await res.json().catch(() => ({}));
         alert(`❌ Failed: ${errData.message || "Something went wrong"}`);
       }
     } catch (err) {
@@ -110,33 +158,59 @@ const ServiceAssignment = () => {
         <div className={styles.fieldGroup}>
           <label className={styles.label}>Select Customer</label>
           <select
-            name="userId"
-            value={formData.userId}
+            name="customerId"
+            value={formData.customerId}
             onChange={handleChange}
             required
             className={styles.select}
           >
             <option value="">-- Select Customer --</option>
-            {customers.map((c) => (
-              <option key={c.userId} value={c.userId}>
-                {c.firstName} {c.lastName} ({c.email})
-              </option>
-            ))}
+            {customers.map((c) => {
+              // choose candidate id properties (customerId or id or userId)
+              const id = c.customerId ?? c.id ?? c.userId;
+              const label =
+                `${c.firstName ?? ""} ${c.lastName ?? ""}`.trim() ||
+                c.name ||
+                id;
+              const contact =
+                c.emails && c.emails.length ? ` (${c.emails[0]})` : "";
+              return (
+                <option key={String(id)} value={String(id)}>
+                  {label}
+                  {contact}
+                </option>
+              );
+            })}
           </select>
         </div>
 
         {/* Vehicle */}
         <div className={styles.fieldGroup}>
-          <label className={styles.label}>Vehicle ID</label>
-          <input
-            type="number"
+          <label className={styles.label}>Select Vehicle</label>
+          <select
             name="vehicleId"
             value={formData.vehicleId}
             onChange={handleChange}
-            placeholder="Enter Vehicle ID"
-            className={styles.input}
             required
-          />
+            disabled={!formData.customerId}
+            className={styles.select}
+          >
+            <option value="">
+              {formData.customerId
+                ? "-- Select Vehicle --"
+                : "Select a customer first"}
+            </option>
+            {vehicles.map((v) => {
+              const vid = v.vehicleId ?? v.id;
+              const reg =
+                v.registrationNo ?? v.registrationNo ?? v.regNo ?? v.reg;
+              return (
+                <option key={String(vid)} value={String(vid)}>
+                  {reg} - {v.brand ?? ""} {v.model ?? ""}
+                </option>
+              );
+            })}
+          </select>
         </div>
 
         {/* Service */}
@@ -150,34 +224,20 @@ const ServiceAssignment = () => {
             className={styles.select}
           >
             <option value="">-- Select Service --</option>
-            {services.map((s) => (
-              <option key={s.serviceId} value={s.serviceId}>
-                {s.name} (₹{s.cost})
-              </option>
-            ))}
+            {services.map((s) => {
+              const sid = s.serviceId ?? s.id;
+              const name =
+                s.serviceName ?? s.name ?? s.service ?? `Service ${sid}`;
+              return (
+                <option key={String(sid)} value={String(sid)}>
+                  {name}
+                </option>
+              );
+            })}
           </select>
         </div>
 
-        {/* Mechanic */}
-        <div className={styles.fieldGroup}>
-          <label className={styles.label}>Assign Mechanic</label>
-          <select
-            name="mechanicId"
-            value={formData.mechanicId}
-            onChange={handleChange}
-            required
-            className={styles.select}
-          >
-            <option value="">-- Select Mechanic --</option>
-            {mechanics.map((m) => (
-              <option key={m.mechanicId} value={m.mechanicId}>
-                {m.firstName} {m.lastName} ({m.city})
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Date and Time */}
+        {/* Date & time */}
         <div className={styles.fieldGroup}>
           <label className={styles.label}>Appointment Date & Time</label>
           <input

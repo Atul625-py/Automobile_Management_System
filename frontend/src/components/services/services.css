@@ -1,0 +1,56 @@
+.service-page {
+  padding: 30px;
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+.service-page h2 {
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.service-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.service-table th,
+.service-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.btn-generate,
+.btn-view,
+.btn-edit {
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
+  margin-right: 5px;
+}
+
+.btn-generate {
+  background-color: #3498db;
+}
+.btn-view {
+  background-color: #2ecc71;
+}
+.btn-edit {
+  background-color: #f39c12;
+}
+
+.btn-generate:hover {
+  background-color: #2980b9;
+}
+.btn-view:hover {
+  background-color: #27ae60;
+}
+.btn-edit:hover {
+  background-color: #e67e22;
+}

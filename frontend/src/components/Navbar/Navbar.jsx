@@ -37,6 +37,18 @@ const Navbar = () => {
                   <Link to="/show-customers" className={styles.dropdownItem}>
                     Show Customers
                   </Link>
+                  <Link to="/add-veichles" className={styles.dropdownItem}>
+                    Add Veichle
+                  </Link>
+                  <Link to="/ongoing-services" className={styles.dropdownItem}>
+                    Ongoing Services
+                  </Link>
+                  <Link
+                    to="/completed-services"
+                    className={styles.dropdownItem}
+                  >
+                    Completed Services
+                  </Link>
                 </>
               )}
 
@@ -49,10 +61,7 @@ const Navbar = () => {
                   <Link to="/remove-customer" className={styles.dropdownItem}>
                     Remove Customer
                   </Link>
-                  <Link
-                    to="/remove-RECEPTIONIST"
-                    className={styles.dropdownItem}
-                  >
+                  <Link to="/remove-managers" className={styles.dropdownItem}>
                     Remove Users
                   </Link>
                   <Link to="/show-customrs" className={styles.dropdownItem}>

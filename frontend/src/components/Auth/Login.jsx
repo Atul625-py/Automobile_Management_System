@@ -32,6 +32,7 @@ const Login = ({ onLogin }) => {
       // Save token in localStorage
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role || "ADMIN");
+      localStorage.setItem("userId", data.userId);
 
       console.log("User role set to:", localStorage.getItem("role"));
 

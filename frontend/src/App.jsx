@@ -16,6 +16,10 @@ import ShowCustomers from "./components/removal/Customer/ShowCustomers";
 import CustomerDetail from "./components/removal/Customer/CustomerDetail";
 import ShowManagers from "./components/removal/Manager/ShowManagers";
 import ManagerDetails from "./components/removal/Manager/ManagerDetails";
+import AddVehicle from "./components/veichles/AddVehicle";
+import OngoingServices from "./components/services/OngoingServices";
+import CompletedServices from "./components/services/CompletedServices";
+import InvoicePage from "./components/invoice/InvoicePage";
 
 // 🆕 Newly added components
 
@@ -46,10 +50,7 @@ function App() {
               )
             }
           />
-          <Route
-            path="/register"
-            element={!isLoggedIn ? <Register /> : <Navigate to="/" />}
-          />
+          <Route path="/register" element={<Register />} />
 
           {/* Mechanics */}
           <Route path="/mechanics" element={<MechanicsPage />} />
@@ -64,13 +65,14 @@ function App() {
 
           {/* ADMIN Features */}
           <Route path="/inventory" element={<InventoryPage />} />
-          <Route path="/remove-Manager" element={<RemoveManager />} />
+          <Route path="/remove-managers" element={<RemoveManager />} />
 
           {/* 🆕 New Routes for Viewing */}
           <Route
             path="/show-customers"
             element={<ShowCustomers></ShowCustomers>}
           />
+          <Route path="/add-veichles" element={<AddVehicle></AddVehicle>} />
           {/* <Route
             path="/show-managers"
             element={<ShowM}
@@ -89,6 +91,26 @@ function App() {
           />
           {/* Redirect unknown paths */}
           <Route path="*" element={<Navigate to="/" />} />
+          <Route
+            path="/ongoing-services"
+            element={<OngoingServices></OngoingServices>}
+          />
+          <Route
+            path="/completed-services"
+            element={<CompletedServices></CompletedServices>}
+          />
+          <Route
+            path="/invoice/generate/:id"
+            element={<InvoicePage mode="generate" />}
+          />
+          <Route
+            path="/invoice/view/:id"
+            element={<InvoicePage mode="view" />}
+          />
+          <Route
+            path="/invoice/edit/:id"
+            element={<InvoicePage mode="edit" />}
+          />
         </Routes>
       </div>
     </AuthProvider>
