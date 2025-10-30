@@ -1,11 +1,10 @@
 package com.rkvk.automobile.automobileshop.mapper;
 
 import com.rkvk.automobile.automobileshop.dto.AppointmentDTO;
-import com.rkvk.automobile.automobileshop.entity.Appointment;
-import com.rkvk.automobile.automobileshop.entity.ServiceEntity;
-import com.rkvk.automobile.automobileshop.entity.User;
-import com.rkvk.automobile.automobileshop.entity.Vehicle;
+import com.rkvk.automobile.automobileshop.entity.*;
 import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AppointmentMapper {
 
@@ -16,21 +15,25 @@ public class AppointmentMapper {
                 .appointmentId(entity.getAppointmentId())
                 .userId(entity.getUser() != null ? entity.getUser().getUserId() : null)
                 .vehicleId(entity.getVehicle() != null ? entity.getVehicle().getVehicleId() : null)
-                .serviceId(entity.getService() != null ? entity.getService().getServiceId() : null)
+                .serviceIds(entity.getServices() != null
+                        ? entity.getServices().stream()
+                        .map(ServiceEntity::getServiceId)
+                        .collect(Collectors.toSet())
+                        : null)
                 .dateTime(entity.getDateTime())
                 .createdAt(entity.getCreatedAt())
                 .status(entity.getStatus())
                 .build();
     }
 
-    public static Appointment toEntity(AppointmentDTO dto, User user, Vehicle vehicle, ServiceEntity service) {
+    public static Appointment toEntity(AppointmentDTO dto, User user, Vehicle vehicle, Set<ServiceEntity> services) {
         if (dto == null) return null;
 
         return Appointment.builder()
                 .appointmentId(dto.getAppointmentId())
                 .user(user)
                 .vehicle(vehicle)
-                .service(service)
+                .services(services)
                 .dateTime(dto.getDateTime())
                 .createdAt(dto.getCreatedAt() != null ? dto.getCreatedAt() : LocalDateTime.now())
                 .status(dto.getStatus() != null ? dto.getStatus() : Appointment.AppointmentStatus.BOOKED)

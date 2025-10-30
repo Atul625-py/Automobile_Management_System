@@ -3,6 +3,8 @@ package com.rkvk.automobile.automobileshop.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "appointment")
@@ -25,9 +27,13 @@ public class Appointment {
     @JoinColumn(name = "vehicle_id", referencedColumnName = "vehicle_id", nullable = false)
     private Vehicle vehicle;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_id", referencedColumnName = "service_id", nullable = false)
-    private ServiceEntity service;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "appointment_services",
+            joinColumns = @JoinColumn(name = "appointment_id"),
+            inverseJoinColumns = @JoinColumn(name = "service_id")
+    )
+    private Set<ServiceEntity> services = new HashSet<>();
 
     @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;
@@ -37,7 +43,7 @@ public class Appointment {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private AppointmentStatus status = AppointmentStatus.BOOKED; // default
+    private AppointmentStatus status = AppointmentStatus.BOOKED;
 
     public enum AppointmentStatus {
         BOOKED,

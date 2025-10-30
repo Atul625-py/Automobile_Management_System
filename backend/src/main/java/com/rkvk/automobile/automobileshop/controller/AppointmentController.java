@@ -20,7 +20,6 @@ public class AppointmentController {
 
     private final AppointmentService appointmentService;
 
-    // CREATE appointment (both can create)
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
     public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody AppointmentDTO dto) {
@@ -28,7 +27,6 @@ public class AppointmentController {
         return ResponseEntity.ok(AppointmentMapper.toDTO(saved));
     }
 
-    // GET by id
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
     public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable Long id) {
@@ -36,7 +34,6 @@ public class AppointmentController {
         return ResponseEntity.ok(AppointmentMapper.toDTO(appointment));
     }
 
-    // LIST all
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
     public ResponseEntity<List<AppointmentDTO>> getAllAppointments() {
@@ -45,7 +42,6 @@ public class AppointmentController {
         return ResponseEntity.ok(list);
     }
 
-    // FILTER by user
     @GetMapping("/user/{userId}")
     @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
     public ResponseEntity<List<AppointmentDTO>> getByUser(@PathVariable Long userId) {
@@ -54,7 +50,6 @@ public class AppointmentController {
         return ResponseEntity.ok(list);
     }
 
-    // FILTER by vehicle
     @GetMapping("/vehicle/{vehicleId}")
     @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
     public ResponseEntity<List<AppointmentDTO>> getByVehicle(@PathVariable Long vehicleId) {
@@ -63,7 +58,6 @@ public class AppointmentController {
         return ResponseEntity.ok(list);
     }
 
-    // FILTER by service
     @GetMapping("/service/{serviceId}")
     @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
     public ResponseEntity<List<AppointmentDTO>> getByService(@PathVariable Long serviceId) {
@@ -72,7 +66,6 @@ public class AppointmentController {
         return ResponseEntity.ok(list);
     }
 
-    // FILTER by createdAt range
     @GetMapping("/created-range")
     @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
     public ResponseEntity<List<AppointmentDTO>> getByCreatedRange(
@@ -83,7 +76,6 @@ public class AppointmentController {
         return ResponseEntity.ok(list);
     }
 
-    // FILTER by scheduled appointment time range
     @GetMapping("/scheduled-range")
     @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
     public ResponseEntity<List<AppointmentDTO>> getByScheduledRange(
@@ -94,14 +86,13 @@ public class AppointmentController {
         return ResponseEntity.ok(list);
     }
 
-    // DELETE appointment
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
     public ResponseEntity<String> deleteAppointment(@PathVariable Long id) {
         appointmentService.deleteAppointment(id);
         return ResponseEntity.ok("Appointment deleted successfully");
     }
-    // FILTER by status
+
     @GetMapping("/status/{status}")
     @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
     public ResponseEntity<List<AppointmentDTO>> getByStatus(@PathVariable Appointment.AppointmentStatus status) {
@@ -110,7 +101,6 @@ public class AppointmentController {
         return ResponseEntity.ok(list);
     }
 
-    // FILTER by user and status
     @GetMapping("/user/{userId}/status/{status}")
     @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
     public ResponseEntity<List<AppointmentDTO>> getByUserAndStatus(@PathVariable Long userId,
@@ -120,7 +110,6 @@ public class AppointmentController {
         return ResponseEntity.ok(list);
     }
 
-    // UPDATE appointment status
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
     public ResponseEntity<AppointmentDTO> updateStatus(@PathVariable Long id,
@@ -128,5 +117,4 @@ public class AppointmentController {
         Appointment updated = appointmentService.updateAppointmentStatus(id, status);
         return ResponseEntity.ok(AppointmentMapper.toDTO(updated));
     }
-
 }

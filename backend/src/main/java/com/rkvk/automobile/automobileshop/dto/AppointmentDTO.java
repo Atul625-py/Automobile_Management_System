@@ -1,12 +1,10 @@
 package com.rkvk.automobile.automobileshop.dto;
 
 import com.rkvk.automobile.automobileshop.entity.Appointment.AppointmentStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -14,10 +12,11 @@ import java.time.LocalDateTime;
 @Builder
 public class AppointmentDTO {
     private Long appointmentId;
-
     private Long userId;
     private Long vehicleId;
-    private Long serviceId;
+
+    // now multiple services
+    private Set<Long> serviceIds;
 
     private LocalDateTime dateTime;
     private LocalDateTime createdAt;

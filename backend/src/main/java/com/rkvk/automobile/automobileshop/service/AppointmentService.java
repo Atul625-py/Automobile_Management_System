@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,12 +25,17 @@ public class AppointmentService {
     public Appointment createAppointment(AppointmentDTO dto) {
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + dto.getUserId()));
+
         Vehicle vehicle = vehicleRepository.findById(dto.getVehicleId())
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with id " + dto.getVehicleId()));
-        ServiceEntity service = serviceEntityRepository.findById(dto.getServiceId())
-                .orElseThrow(() -> new ResourceNotFoundException("Service not found with id " + dto.getServiceId()));
 
-        Appointment appointment = AppointmentMapper.toEntity(dto, user, vehicle, service);
+        // multiple services
+        Set<ServiceEntity> services = dto.getServiceIds().stream()
+                .map(id -> serviceEntityRepository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Service not found with id " + id)))
+                .collect(Collectors.toSet());
+
+        Appointment appointment = AppointmentMapper.toEntity(dto, user, vehicle, services);
         return appointmentRepository.save(appointment);
     }
 
@@ -53,12 +60,10 @@ public class AppointmentService {
         return appointmentRepository.findByService_ServiceId(serviceId);
     }
 
-    // Filter by created time range
     public List<Appointment> getAppointmentsByCreatedRange(LocalDateTime start, LocalDateTime end) {
         return appointmentRepository.findByCreatedAtBetween(start, end);
     }
 
-    // Filter by scheduled appointment time range
     public List<Appointment> getAppointmentsByScheduledRange(LocalDateTime start, LocalDateTime end) {
         return appointmentRepository.findByDateTimeBetween(start, end);
     }
@@ -69,6 +74,7 @@ public class AppointmentService {
         }
         appointmentRepository.deleteById(id);
     }
+
     public List<Appointment> getAppointmentsByStatus(Appointment.AppointmentStatus status) {
         return appointmentRepository.findByStatus(status);
     }
@@ -79,9 +85,8 @@ public class AppointmentService {
 
     public Appointment updateAppointmentStatus(Long id, Appointment.AppointmentStatus newStatus) {
         Appointment appointment = appointmentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id " + id));
         appointment.setStatus(newStatus);
         return appointmentRepository.save(appointment);
     }
-
 }
