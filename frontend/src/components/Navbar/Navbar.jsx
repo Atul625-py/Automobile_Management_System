@@ -44,13 +44,16 @@ const Navbar = () => {
               {userRole === "admin" && (
                 <>
                   <Link to="/show-managers" className={styles.dropdownItem}>
-                    Show Managers
+                    Show Users
                   </Link>
                   <Link to="/remove-customer" className={styles.dropdownItem}>
                     Remove Customer
                   </Link>
                   <Link to="/remove-manager" className={styles.dropdownItem}>
-                    Remove Manager
+                    Remove Users
+                  </Link>
+                  <Link to="/show-customrs" className={styles.dropdownItem}>
+                    Show Customers
                   </Link>
                 </>
               )}
