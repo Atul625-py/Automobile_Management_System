@@ -20,7 +20,7 @@ public class UserController {
 
     // ----- CREATE -----
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
         User savedUser = userService.createUser(userDTO);
         return ResponseEntity.ok(UserMapper.toDTO(savedUser));

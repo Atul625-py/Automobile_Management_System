@@ -19,6 +19,7 @@ const ShowManagers = () => {
         });
         if (!response.ok) throw new Error("Failed to fetch managers");
         const data = await response.json();
+        console.log("Fetched managers:", data);
         setManagers(data);
       } catch (error) {
         console.error("Error fetching managers:", error);
