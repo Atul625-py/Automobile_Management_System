@@ -9,7 +9,7 @@ const Register = () => {
 
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    userName: "",
+    username: "",
     firstName: "",
     middleNames: [""],
     lastName: "",
@@ -53,7 +53,7 @@ const Register = () => {
   // Step 1 validation
   const validateStep1 = () => {
     const newErrors = {};
-    if (!formData.userName.trim()) newErrors.userName = "username is required";
+    if (!formData.username.trim()) newErrors.username = "username is required";
     if (!formData.firstName.trim()) newErrors.firstName = "First name required";
     if (!formData.lastName.trim()) newErrors.lastName = "Last name required";
     if (!formData.role) newErrors.role = "Role is required";
@@ -97,7 +97,7 @@ const Register = () => {
 
     try {
       console.log("Submitting registration data:", formData);
-      const response = await fetch("/api/customers", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData), //  send arrays
@@ -118,7 +118,7 @@ const Register = () => {
     } catch (err) {
       console.error(err);
       // alert("Something went wrong. Please try again.");
-      navigate("/");
+      // navigate("/");
     }
   };
   // if (response.ok) {
@@ -159,14 +159,14 @@ const Register = () => {
             <div className={styles.inputGroup}>
               <input
                 type="text"
-                name="userName"
-                value={formData.userName}
+                name="username"
+                value={formData.username}
                 onChange={handleChange}
                 required
               />
-              <label>userName</label>
-              {errors.userName && (
-                <p className={styles.error}>{errors.userName}</p>
+              <label>username</label>
+              {errors.username && (
+                <p className={styles.error}>{errors.username}</p>
               )}
             </div>
             <div className={styles.inputGroup}>
