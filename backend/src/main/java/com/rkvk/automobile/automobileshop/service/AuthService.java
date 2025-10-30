@@ -1,5 +1,6 @@
 package com.rkvk.automobile.automobileshop.service;
 
+import com.rkvk.automobile.automobileshop.auth.dto.AuthenticationResponseDTO;
 import com.rkvk.automobile.automobileshop.entity.User;
 import com.rkvk.automobile.automobileshop.exception.DuplicateUsernameException;
 import com.rkvk.automobile.automobileshop.repository.UserRepository;
@@ -36,15 +37,23 @@ public class AuthService {
     /**
      * Login user and return JWT token
      */
-    public String login(String username, String password) {
+    public AuthenticationResponseDTO login(String username, String password) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
         );
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
         User dbUser = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return jwtUtil.generateToken(dbUser.getUsername(), dbUser.getRole().name());
+        String token = jwtUtil.generateToken(dbUser.getUsername(), dbUser.getRole().name());
+
+        return AuthenticationResponseDTO.builder()
+                .token(token)
+                .userId(dbUser.getUserId())
+                .role(dbUser.getRole().name())
+                .build();
     }
+
 }
