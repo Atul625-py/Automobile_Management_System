@@ -16,6 +16,7 @@ import ShowCustomers from "./components/removal/Customer/ShowCustomers";
 import CustomerDetail from "./components/removal/Customer/CustomerDetail";
 import ShowManagers from "./components/removal/Manager/ShowManagers";
 import ManagerDetails from "./components/removal/Manager/ManagerDetails";
+import AddVehicle from "./components/veichles/AddVehicle";
 
 // 🆕 Newly added components
 
@@ -71,6 +72,7 @@ function App() {
             path="/show-customers"
             element={<ShowCustomers></ShowCustomers>}
           />
+          <Route path="/add-veichles" element={<AddVehicle></AddVehicle>} />
           {/* <Route
             path="/show-managers"
             element={<ShowM}

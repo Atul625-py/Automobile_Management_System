@@ -6,9 +6,10 @@ const ServiceAssignment = () => {
   const [customers, setCustomers] = useState([]);
   const [mechanics, setMechanics] = useState([]);
   const [services, setServices] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
   const [formData, setFormData] = useState({
     userId: "",
-    vehicleId: "",
+    registrationNo: "",
     serviceId: "",
     mechanicId: "",
     dateTime: "",
@@ -16,34 +17,47 @@ const ServiceAssignment = () => {
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem("token");
 
-  // Fetch all required data once
+  // Fetch all dropdown data once
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [usersRes, mechanicsRes, servicesRes] = await Promise.all([
-          fetch("/api/users", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch("/api/mechanics", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          fetch("/api/services", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
+        const [usersRes, mechanicsRes, servicesRes, vehiclesRes] =
+          await Promise.all([
+            fetch("/api/users", {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+            fetch("/api/mechanics", {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+            fetch("/api/services", {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+            fetch("/api/vehicles", {
+              headers: { Authorization: `Bearer ${token}` },
+            }),
+          ]);
 
-        if (!usersRes.ok || !mechanicsRes.ok || !servicesRes.ok)
+        if (
+          !usersRes.ok ||
+          !mechanicsRes.ok ||
+          !servicesRes.ok ||
+          !vehiclesRes.ok
+        ) {
           throw new Error("Failed to load dropdown data");
+        }
 
-        const [usersData, mechanicsData, servicesData] = await Promise.all([
-          usersRes.json(),
-          mechanicsRes.json(),
-          servicesRes.json(),
-        ]);
+        const [usersData, mechanicsData, servicesData, vehiclesData] =
+          await Promise.all([
+            usersRes.json(),
+            mechanicsRes.json(),
+            servicesRes.json(),
+            vehiclesRes.json(),
+          ]);
 
         setCustomers(usersData);
         setMechanics(mechanicsData);
         setServices(servicesData);
+        setVehicles(vehiclesData);
       } catch (err) {
         console.error("Error fetching data:", err);
         alert("❌ Failed to load data. Please check backend APIs.");
@@ -73,7 +87,7 @@ const ServiceAssignment = () => {
         },
         body: JSON.stringify({
           userId: formData.userId,
-          vehicleId: formData.vehicleId,
+          registrationNo: formData.registrationNo,
           serviceId: formData.serviceId,
           mechanicId: formData.mechanicId,
           dateTime: formData.dateTime,
@@ -84,7 +98,7 @@ const ServiceAssignment = () => {
         alert("✅ Appointment created successfully!");
         setFormData({
           userId: "",
-          vehicleId: "",
+          registrationNo: "",
           serviceId: "",
           mechanicId: "",
           dateTime: "",
@@ -125,18 +139,23 @@ const ServiceAssignment = () => {
           </select>
         </div>
 
-        {/* Vehicle */}
+        {/* Vehicle (Registration No Dropdown) */}
         <div className={styles.fieldGroup}>
-          <label className={styles.label}>Vehicle ID</label>
-          <input
-            type="number"
-            name="vehicleId"
-            value={formData.vehicleId}
+          <label className={styles.label}>Select Vehicle (Reg. No)</label>
+          <select
+            name="registrationNo"
+            value={formData.registrationNo}
             onChange={handleChange}
-            placeholder="Enter Vehicle ID"
-            className={styles.input}
             required
-          />
+            className={styles.select}
+          >
+            <option value="">-- Select Vehicle --</option>
+            {vehicles.map((v) => (
+              <option key={v.vehicleId} value={v.registrationNo}>
+                {v.registrationNo} - {v.brand} {v.model}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Service */}

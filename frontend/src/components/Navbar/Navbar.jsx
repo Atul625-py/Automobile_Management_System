@@ -37,6 +37,9 @@ const Navbar = () => {
                   <Link to="/show-customers" className={styles.dropdownItem}>
                     Show Customers
                   </Link>
+                  <Link to="/add-veichles" className={styles.dropdownItem}>
+                    Add Veichle
+                  </Link>
                 </>
               )}
 
