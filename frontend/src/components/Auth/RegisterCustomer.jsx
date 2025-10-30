@@ -138,13 +138,13 @@ const RegisterCustomer = () => {
   }
 
   const roleOptions =
-    userRole === "admin"
+    userRole === "ADMIN"
       ? [
           { value: "customer", label: "Customer" },
-          { value: "manager", label: "Manager" },
-          { value: "admin", label: "Admin" },
+          { value: "RECEPTIONIST", label: "RECEPTIONIST" },
+          { value: "ADMIN", label: "ADMIN" },
         ]
-      : userRole === "manager"
+      : userRole === "RECEPTIONIST"
       ? [{ value: "customer", label: "Customer" }]
       : [];
 

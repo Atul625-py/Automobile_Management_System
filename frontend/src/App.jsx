@@ -62,9 +62,9 @@ function App() {
           <Route path="/add-customer" element={<RegisterCustomer />} />
           <Route path="/remove-customer" element={<RemoveCustomer />} />
 
-          {/* Admin Features */}
+          {/* ADMIN Features */}
           <Route path="/inventory" element={<InventoryPage />} />
-          <Route path="/remove-manager" element={<RemoveManager />} />
+          <Route path="/remove-Manager" element={<RemoveManager />} />
 
           {/* 🆕 New Routes for Viewing */}
           <Route
@@ -84,7 +84,7 @@ function App() {
             element={<ShowManagers></ShowManagers>}
           />
           <Route
-            path="/manager/:id"
+            path="/Manager/:id"
             element={<ManagerDetails></ManagerDetails>}
           />
           {/* Redirect unknown paths */}

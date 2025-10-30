@@ -31,8 +31,8 @@ const Navbar = () => {
           {isVerified && <span className={styles.verifiedTick}>✅</span>}
           {showMenu && (
             <div className={styles.dropdown}>
-              {/* Manager / Admin Options */}
-              {(userRole === "manager" || userRole === "admin") && (
+              {/* RECEPTIONIST / ADMIN Options */}
+              {(userRole === "RECEPTIONIST" || userRole === "ADMIN") && (
                 <>
                   <Link to="/show-customers" className={styles.dropdownItem}>
                     Show Customers
@@ -40,8 +40,8 @@ const Navbar = () => {
                 </>
               )}
 
-              {/* Admin-only options */}
-              {userRole === "admin" && (
+              {/* ADMIN-only options */}
+              {userRole === "ADMIN" && (
                 <>
                   <Link to="/show-managers" className={styles.dropdownItem}>
                     Show Users
@@ -49,7 +49,10 @@ const Navbar = () => {
                   <Link to="/remove-customer" className={styles.dropdownItem}>
                     Remove Customer
                   </Link>
-                  <Link to="/remove-manager" className={styles.dropdownItem}>
+                  <Link
+                    to="/remove-RECEPTIONIST"
+                    className={styles.dropdownItem}
+                  >
                     Remove Users
                   </Link>
                   <Link to="/show-customrs" className={styles.dropdownItem}>
@@ -72,7 +75,7 @@ const Navbar = () => {
           </Link>
         )}
 
-        {(userRole === "manager" || userRole === "admin") && (
+        {(userRole === "RECEPTIONIST" || userRole === "ADMIN") && (
           <>
             <Link to="/add-customer" className={styles.navLink}>
               Add Customer
@@ -80,7 +83,7 @@ const Navbar = () => {
           </>
         )}
 
-        {userRole === "admin" && (
+        {userRole === "ADMIN" && (
           <>
             <Link to="/register" className={styles.navLink}>
               Add User
