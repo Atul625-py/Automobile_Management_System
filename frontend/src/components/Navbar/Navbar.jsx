@@ -38,11 +38,6 @@ const Navbar = () => {
                 <Link to="/add-customer" className={styles.dropdownItem}>
                   Add Customer
                 </Link>
-                {userRole === "ADMIN" && (
-                  <Link to="/remove-customer" className={styles.dropdownItem}>
-                    Remove Customer
-                  </Link>
-                )}
                 <Link to="/show-customers" className={styles.dropdownItem}>
                   Show Customers
                 </Link>
@@ -64,9 +59,6 @@ const Navbar = () => {
                 <Link to="/register" className={styles.dropdownItem}>
                   Add User
                 </Link>
-                <Link to="/remove-managers" className={styles.dropdownItem}>
-                  Remove User
-                </Link>
                 <Link to="/show-managers" className={styles.dropdownItem}>
                   Show Users
                 </Link>
@@ -85,17 +77,14 @@ const Navbar = () => {
             <span className={styles.navLink}>Appointment ▾</span>
             {showAppointmentMenu && (
               <div className={styles.dropdown}>
-                <Link to="/add-appointment-page" className={styles.dropdownItem}>
+                <Link
+                  to="/add-appointment-page"
+                  className={styles.dropdownItem}
+                >
                   Add Appointment
                 </Link>
                 <Link to="/all-appointments" className={styles.dropdownItem}>
                   All Appointments
-                </Link>
-                <Link to="/ongoing-services" className={styles.dropdownItem}>
-                  Ongoing Services
-                </Link>
-                <Link to="/completed-services" className={styles.dropdownItem}>
-                  Completed Services
                 </Link>
               </div>
             )}

@@ -38,24 +38,6 @@ const CustomerDetail = () => {
     }));
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this customer?"))
-      return;
-
-    try {
-      const response = await fetch(`/api/customers/${id}`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!response.ok) throw new Error("Failed to delete customer");
-      alert("Customer deleted successfully!");
-      navigate("/show-customers");
-    } catch (err) {
-      console.error("Error deleting customer:", err);
-      alert("Error deleting customer!");
-    }
-  };
-
   const handleUpdate = async () => {
     try {
       const response = await fetch(`/api/customers/${id}`, {
@@ -72,10 +54,10 @@ const CustomerDetail = () => {
       const updatedCustomer = await response.json();
       setCustomer(updatedCustomer);
       setIsEditing(false);
-      alert("Customer updated successfully!");
+      alert("✅ Customer updated successfully!");
     } catch (err) {
       console.error("Error updating customer:", err);
-      alert("Error updating customer!");
+      alert("❌ Error updating customer!");
     }
   };
 
@@ -159,8 +141,15 @@ const CustomerDetail = () => {
               </p>
             )}
             <p>
-              <strong>Address:</strong> {customer.houseNo}, {customer.street},{" "}
-              {customer.locality}, {customer.city}
+              <strong>Address:</strong>{" "}
+              {[
+                customer.houseNo,
+                customer.street,
+                customer.locality,
+                customer.city,
+              ]
+                .filter(Boolean)
+                .join(", ")}
             </p>
           </>
         )}
@@ -168,17 +157,12 @@ const CustomerDetail = () => {
 
       <div className={styles.buttonGroup}>
         {!isEditing ? (
-          <>
-            <button
-              className={styles.editButton}
-              onClick={() => setIsEditing(true)}
-            >
-              ✏️ Edit Customer
-            </button>
-            <button className={styles.deleteButton} onClick={handleDelete}>
-              🗑️ Delete Customer
-            </button>
-          </>
+          <button
+            className={styles.editButton}
+            onClick={() => setIsEditing(true)}
+          >
+            ✏️ Edit Customer
+          </button>
         ) : (
           <>
             <button className={styles.saveButton} onClick={handleUpdate}>
@@ -196,6 +180,10 @@ const CustomerDetail = () => {
           </>
         )}
       </div>
+
+      <button className={styles.backButton} onClick={() => navigate(-1)}>
+        ← Back
+      </button>
     </div>
   );
 };
