@@ -4,6 +4,7 @@ import styles from "./AddVehicle.module.css";
 const AddVehicle = () => {
   const token = localStorage.getItem("token");
   const [customers, setCustomers] = useState([]);
+  const [customerMap, setCustomerMap] = useState({});
   const [vehicles, setVehicles] = useState([]);
   const [formData, setFormData] = useState({
     registrationNo: "",
@@ -15,7 +16,7 @@ const AddVehicle = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  // ✅ Fetch all customers for dropdown
+  // ✅ Fetch all customers
   const fetchCustomers = async () => {
     try {
       const res = await fetch("/api/customers", {
@@ -24,8 +25,15 @@ const AddVehicle = () => {
       if (!res.ok) throw new Error("Failed to fetch customers");
       const data = await res.json();
       setCustomers(data);
+
+      // Create a map for easy lookup
+      const map = data.reduce((acc, c) => {
+        acc[c.customerId] = `${c.firstName ?? ""} ${c.lastName ?? ""}`.trim();
+        return acc;
+      }, {});
+      setCustomerMap(map);
     } catch (err) {
-      console.error("Error fetching customers:", err);
+      console.error("❌ Error fetching customers:", err);
     }
   };
 
@@ -39,15 +47,14 @@ const AddVehicle = () => {
       const data = await res.json();
       setVehicles(data);
     } catch (err) {
-      console.error("Error fetching vehicles:", err);
+      console.error("❌ Error fetching vehicles:", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCustomers();
-    fetchVehicles();
+    Promise.all([fetchCustomers(), fetchVehicles()]);
   }, []);
 
   // ✅ Handle form input change
@@ -84,8 +91,8 @@ const AddVehicle = () => {
       });
       fetchVehicles();
     } catch (err) {
-      console.error("Error adding vehicle:", err);
-      alert("❌ Failed to add vehicle");
+      console.error("❌ Error adding vehicle:", err);
+      alert("Failed to add vehicle");
     }
   };
 
@@ -99,11 +106,11 @@ const AddVehicle = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to delete vehicle");
-      alert("Vehicle deleted successfully!");
+      alert("✅ Vehicle deleted successfully!");
       fetchVehicles();
     } catch (err) {
-      console.error("Error deleting vehicle:", err);
-      alert("❌ Failed to delete vehicle");
+      console.error("❌ Error deleting vehicle:", err);
+      alert("Failed to delete vehicle");
     }
   };
 
@@ -207,7 +214,10 @@ const AddVehicle = () => {
                   <td>{v.model}</td>
                   <td>{v.year}</td>
                   <td>{v.fuelType}</td>
-                  <td>{v.customerId}</td>
+                  <td>
+                    {customerMap[v.customerId] ??
+                      `Customer ${v.customerId ?? "?"}`}
+                  </td>
                   <td>
                     <button
                       onClick={() => handleDelete(v.vehicleId)}
