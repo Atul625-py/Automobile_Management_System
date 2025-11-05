@@ -95,3 +95,50 @@
 .dropdownItem:hover {
   background: #f0f0f0;
 }
+
+/* Ensure dropdown stays visible when hovering over it */
+.dropdownContainer {
+    position: relative;
+}
+
+.dropdownContainer .dropdown {
+    position: absolute;
+    top: 100%; /* directly below the parent */
+    left: 0;
+    display: none;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 160px;
+}
+
+/* keep dropdown visible while hovering over parent or dropdown */
+.dropdownContainer:hover .dropdown {
+    display: block;
+}
+
+/* Dropdown items spacing and hover effect */
+.dropdownItem {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: black;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.dropdownItem:hover {
+    background: #f0f0f0;
+}
+
+/* Optional: add a tiny invisible padding buffer to prevent flicker */
+.dropdownContainer::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 5px; /* buffer area */
+}

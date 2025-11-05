@@ -18,42 +18,36 @@ const InvoicePage = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
-  // Utility for fetch
   const authHeaders = {
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
   };
 
-  // ---- Fetch all needed data once ----
   useEffect(() => {
     const init = async () => {
       try {
         await Promise.all([fetchInventory(), fetchMechanics()]);
-        await fetchInvoice(); // Only after data is loaded
+        await fetchInvoice();
       } catch (err) {
         console.error("Init error:", err);
         setMessage("⚠️ Failed to load invoice details.");
       }
     };
     init();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appointmentId]);
 
-  // ---- Fetch inventory ----
   const fetchInventory = async () => {
     const res = await fetch("/api/inventory", { headers: authHeaders });
     if (!res.ok) throw new Error("Failed to fetch inventory");
     setInventory(await res.json());
   };
 
-  // ---- Fetch mechanics ----
   const fetchMechanics = async () => {
     const res = await fetch("/api/mechanics", { headers: authHeaders });
     if (!res.ok) throw new Error("Failed to fetch mechanics");
     setMechanics(await res.json());
   };
 
-  // ---- Fetch invoice for this appointment ----
   const fetchInvoice = async () => {
     setLoading(true);
     setMessage("");
@@ -75,7 +69,6 @@ const InvoicePage = () => {
         );
         setSelectedMechanics((data.mechanics || []).map((m) => m.mechanicId));
       } else if (res.status === 404) {
-        // No invoice yet for this appointment
         setInvoice(null);
         setTaxPercentage("");
         setLabourCost("");
@@ -94,22 +87,23 @@ const InvoicePage = () => {
     }
   };
 
-  // ---- Part manipulation ----
-  const addPartRow = () => setUsedParts((prev) => [...prev, { partId: "", count: 1 }]);
-  const removePartRow = (index) => setUsedParts((prev) => prev.filter((_, i) => i !== index));
+  const addPartRow = () =>
+    setUsedParts((prev) => [...prev, { partId: "", count: 1 }]);
+  const removePartRow = (index) =>
+    setUsedParts((prev) => prev.filter((_, i) => i !== index));
   const updatePartRow = (index, field, value) =>
     setUsedParts((prev) =>
       prev.map((row, i) => (i === index ? { ...row, [field]: value } : row))
     );
 
-  // ---- Mechanics selection ----
   const handleMechanicToggle = (id) => {
     setSelectedMechanics((prev) =>
-      prev.includes(id) ? prev.filter((mid) => mid !== id) : [...prev, id]
+      prev.includes(id)
+        ? prev.filter((mid) => mid !== id)
+        : [...prev, id]
     );
   };
 
-  // ---- Save (create or update) ----
   const handleSave = async () => {
     setSaving(true);
     setMessage("");
@@ -143,7 +137,11 @@ const InvoicePage = () => {
         throw new Error(msg || `${method} failed (${res.status})`);
       }
 
-      setMessage(invoice ? "✅ Invoice updated successfully!" : "✅ Invoice created successfully!");
+      setMessage(
+        invoice
+          ? "✅ Invoice updated successfully!"
+          : "✅ Invoice created successfully!"
+      );
       await fetchInvoice();
     } catch (err) {
       console.error("Invoice save error:", err);
@@ -151,6 +149,132 @@ const InvoicePage = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  // ✅ PRINTABLE INVOICE FUNCTION
+  const handlePrintInvoice = () => {
+    if (!usedParts.length && !labourCost) {
+      alert("⚠️ Please add parts or labour cost before printing the invoice.");
+      return;
+    }
+
+    const partDetails = usedParts.map((p) => {
+      const part = inventory.find((x) => x.partId === Number(p.partId));
+      const name = part?.name || `Part ${p.partId}`;
+      const unit = part?.unitPrice || 0;
+      const total = unit * (Number(p.count) || 0);
+      return { name, count: p.count, unit, total };
+    });
+
+    const partsTotal = partDetails.reduce((sum, p) => sum + p.total, 0);
+    const subtotal = partsTotal + (Number(labourCost) || 0);
+    const tax = (subtotal * (Number(taxPercentage) || 0)) / 100;
+    const grandTotal = subtotal + tax;
+
+    const assignedMechanics = mechanics
+      .filter((m) => selectedMechanics.includes(m.mechanicId))
+      .map((m) => `${m.firstName} ${m.lastName} (${m.city})`)
+      .join(", ") || "—";
+
+    const printWindow = window.open("", "_blank");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Invoice for Appointment #${appointmentId}</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 40px;
+              color: #333;
+            }
+            h1, h2, h3 { text-align: center; }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 20px;
+            }
+            th, td {
+              border: 1px solid #ddd;
+              padding: 10px;
+              text-align: left;
+            }
+            th { background-color: #f3f6fa; }
+            .totals {
+              margin-top: 20px;
+              width: 50%;
+              float: right;
+              border-collapse: collapse;
+            }
+            .totals td {
+              border: 1px solid #ddd;
+              padding: 8px;
+            }
+            .totals tr:last-child td {
+              font-weight: bold;
+              background: #f8f8f8;
+            }
+            .footer {
+              margin-top: 60px;
+              text-align: center;
+              font-size: 14px;
+              color: #555;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>RKVK Automobiles</h1>
+          <h2>Invoice for Appointment #${appointmentId}</h2>
+          <h3>Date: ${new Date().toLocaleDateString()}</h3>
+          <h3>Serviced by: ${assignedMechanics}</h3>
+
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Part Name</th>
+                <th>Quantity</th>
+                <th>Unit Price (₹)</th>
+                <th>Total (₹)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${
+                partDetails.length > 0
+                  ? partDetails
+                      .map(
+                        (p, i) => `
+                <tr>
+                  <td>${i + 1}</td>
+                  <td>${p.name}</td>
+                  <td>${p.count}</td>
+                  <td>${p.unit}</td>
+                  <td>${p.total}</td>
+                </tr>`
+                      )
+                      .join("")
+                  : `<tr><td colspan="5" style="text-align:center;">No spare parts used</td></tr>`
+              }
+            </tbody>
+          </table>
+
+          <table class="totals">
+            <tr><td>Spare Parts Total</td><td>₹${partsTotal.toFixed(2)}</td></tr>
+            <tr><td>Labour Cost</td><td>₹${Number(labourCost).toFixed(2)}</td></tr>
+            <tr><td>Tax (${taxPercentage || 0}%)</td><td>₹${tax.toFixed(2)}</td></tr>
+            <tr><td><strong>Grand Total</strong></td><td><strong>₹${grandTotal.toFixed(2)}</strong></td></tr>
+          </table>
+
+          <div class="footer">
+            <p>Thank you for choosing RKVK Automobiles!</p>
+            <p>Visit again for your next service.</p>
+          </div>
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
   };
 
   if (loading) return <p className={styles.loading}>Loading invoice...</p>;
@@ -223,7 +347,11 @@ const InvoicePage = () => {
               min="1"
               className={styles.countInput}
             />
-            <button type="button" onClick={() => removePartRow(i)} className={styles.removeBtn}>
+            <button
+              type="button"
+              onClick={() => removePartRow(i)}
+              className={styles.removeBtn}
+            >
               ✕
             </button>
           </div>
@@ -234,8 +362,16 @@ const InvoicePage = () => {
         </button>
 
         <div className={styles.actions}>
-          <button onClick={handleSave} disabled={saving} className={styles.saveBtn}>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className={styles.saveBtn}
+          >
             {saving ? "Saving..." : "💾 Save Invoice"}
+          </button>
+
+          <button onClick={handlePrintInvoice} className={styles.printBtn}>
+            🖨️ Print / Save as PDF
           </button>
 
           <button onClick={() => navigate(-1)} className={styles.backBtn}>

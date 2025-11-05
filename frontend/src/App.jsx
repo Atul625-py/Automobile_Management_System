@@ -24,8 +24,9 @@ import AllAppointments from "./components/services/AllAppointments";
 import EditAppointment from "./components/services/EditAppointment";
 import AddService from "./components/services/AddService";
 import AppointmentDetail from "./components/appointmentDetail/AppointmentDetail";
+import AllInvoices from "./components/invoice/AllInvoices"; 
+import ViewService from "./components/services/ViewService";
 
-// 🆕 Newly added components
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -71,67 +72,32 @@ function App() {
           <Route path="/inventory" element={<InventoryPage />} />
           <Route path="/remove-managers" element={<RemoveManager />} />
 
-          {/* 🆕 New Routes for Viewing */}
-          <Route
-            path="/show-customers"
-            element={<ShowCustomers></ShowCustomers>}
-          />
-          <Route path="/add-services" element={<AddService></AddService>} />
-          <Route path="/add-veichles" element={<AddVehicle></AddVehicle>} />
-          {/* <Route
-            path="/show-managers"
-            element={<ShowM}
-          /> */}
-          <Route
-            path="/customer/:id"
-            element={<CustomerDetail></CustomerDetail>}
-          />
-          <Route
-            path="/show-managers"
-            element={<ShowManagers></ShowManagers>}
-          />
-          <Route
-            path="/Manager/:id"
-            element={<ManagerDetails></ManagerDetails>}
-          />
+          {/* Viewing */}
+          <Route path="/show-customers" element={<ShowCustomers />} />
+          <Route path="/add-services" element={<AddService />} />
+          <Route path="/add-veichles" element={<AddVehicle />} />
+          <Route path="/customer/:id" element={<CustomerDetail />} />
+          <Route path="/show-managers" element={<ShowManagers />} />
+          <Route path="/Manager/:id" element={<ManagerDetails />} />
+
+          <Route path="/ongoing-services" element={<OngoingServices />} />
+          <Route path="/completed-services" element={<CompletedServices />} />
+          <Route path="/view-services" element={<ViewService />} />
+
+          {/* Invoices */}
+          <Route path="/invoice/generate/:id" element={<InvoicePage mode="generate" />} />
+          <Route path="/invoice/view/:id" element={<InvoicePage mode="view" />} />
+          <Route path="/invoice/edit/:id" element={<InvoicePage mode="edit" />} />
+          <Route path="/invoice/:appointmentId" element={<InvoicePage />} />
+          <Route path="/all-invoices" element={<AllInvoices />} />
+
+          {/* Appointments */}
+          <Route path="/all-appointments" element={<AllAppointments />} />
+          <Route path="/edit-appointment/:id" element={<EditAppointment />} />
+          <Route path="/appointment-details/:id" element={<AppointmentDetail />} />
+
           {/* Redirect unknown paths */}
           <Route path="*" element={<Navigate to="/" />} />
-          <Route
-            path="/ongoing-services"
-            element={<OngoingServices></OngoingServices>}
-          />
-          <Route
-            path="/completed-services"
-            element={<CompletedServices></CompletedServices>}
-          />
-          <Route
-            path="/invoice/generate/:id"
-            element={<InvoicePage mode="generate" />}
-          />
-          <Route
-            path="/invoice/view/:id"
-            element={<InvoicePage mode="view" />}
-          />
-          <Route
-            path="/invoice/edit/:id"
-            element={<InvoicePage mode="edit" />}
-          />
-          <Route
-            path="all-appointments"
-            element={<AllAppointments></AllAppointments>}
-          />
-          <Route
-            path="/edit-appointment/:id"
-            element={<EditAppointment></EditAppointment>}
-          />
-          <Route
-            path="/appointment-details/:id"
-            element={<AppointmentDetail></AppointmentDetail>}
-          />
-          <Route
-            path="/invoice/:appointmentId"
-            element={<InvoicePage></InvoicePage>}
-          />
         </Routes>
       </div>
     </AuthProvider>

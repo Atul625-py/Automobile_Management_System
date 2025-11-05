@@ -192,3 +192,16 @@ h2 {
 .mechanicItem input {
   margin-right: 6px;
 }
+.printBtn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.printBtn:hover {
+  background-color: #218838;
+}

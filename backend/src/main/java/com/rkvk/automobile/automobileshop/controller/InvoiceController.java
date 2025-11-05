@@ -59,4 +59,11 @@ public class InvoiceController {
     public ResponseEntity<List<InvoiceDTO>> getInvoicesForVehicle(@PathVariable Long vehicleId) {
         return ResponseEntity.ok(invoiceService.getInvoicesForVehicle(vehicleId));
     }
+
+    // ✅ NEW ENDPOINT: Fetch all invoices
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','RECEPTIONIST')")
+    public ResponseEntity<List<InvoiceDTO>> getAllInvoices() {
+        return ResponseEntity.ok(invoiceService.getAllInvoices());
+    }
 }

@@ -189,4 +189,12 @@ public class InvoiceService {
                 .collect(Collectors.toList());
     }
 
+    public List<InvoiceDTO> getAllInvoices() {
+        return invoiceRepository.findAll()
+                .stream()
+                .map(InvoiceMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+
 }
