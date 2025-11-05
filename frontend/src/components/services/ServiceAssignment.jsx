@@ -1,4 +1,3 @@
-// src/pages/ServiceAssignment.jsx
 import React, { useEffect, useState } from "react";
 import styles from "./ServiceAssignment.module.css";
 
@@ -9,7 +8,7 @@ const ServiceAssignment = () => {
   const [formData, setFormData] = useState({
     customerId: "",
     vehicleId: "",
-    serviceId: "",
+    serviceIds: [], // multiple services
     dateTime: "",
   });
   const [loading, setLoading] = useState(true);
@@ -36,12 +35,11 @@ const ServiceAssignment = () => {
           servicesRes.json(),
         ]);
 
-        // normalize: prefer numeric ids customer.customerId or customer.id
         setCustomers(customersData);
         setServices(servicesData);
       } catch (err) {
         console.error("Error fetching initial dropdowns:", err);
-        alert("❌ Failed to load customers/services. Check backend.");
+        alert("❌ Failed to load customers/services.");
       } finally {
         setLoading(false);
       }
@@ -60,11 +58,7 @@ const ServiceAssignment = () => {
 
     const fetchVehicles = async () => {
       try {
-        // ensure it's the numeric id only
-        const id = Number(customerId);
-        if (!id) throw new Error("Invalid customer id");
-
-        const res = await fetch(`/api/vehicles/customer/${id}`, {
+        const res = await fetch(`/api/vehicles/customer/${customerId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -74,7 +68,6 @@ const ServiceAssignment = () => {
         setVehicles(data);
       } catch (err) {
         console.error("Error fetching vehicles:", err);
-        setVehicles([]);
         alert("❌ Could not fetch vehicles for selected customer");
       }
     };
@@ -82,40 +75,39 @@ const ServiceAssignment = () => {
     fetchVehicles();
   }, [formData.customerId, token]);
 
-  // handle input
+  // handle input changes
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((p) => ({ ...p, [name]: value }));
-    // if customer changed, clear selected vehicle
-    if (name === "customerId") setFormData((p) => ({ ...p, vehicleId: "" }));
+    const { name, value, options } = e.target;
+
+    if (name === "serviceIds") {
+      const selected = Array.from(options)
+        .filter((opt) => opt.selected)
+        .map((opt) => Number(opt.value));
+      setFormData((p) => ({ ...p, serviceIds: selected }));
+    } else if (name === "customerId") {
+      // clear vehicle when customer changes
+      setFormData((p) => ({ ...p, customerId: value, vehicleId: "" }));
+    } else {
+      setFormData((p) => ({ ...p, [name]: value }));
+    }
   };
 
   // submit appointment
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.customerId) {
-      alert("Please select a customer first.");
-      return;
-    }
-    if (!formData.vehicleId) {
-      alert("Please select a vehicle.");
-      return;
-    }
-    if (!formData.serviceId) {
-      alert("Please select a service.");
-      return;
-    }
-    if (!formData.dateTime) {
-      alert("Please select appointment date & time.");
-      return;
-    }
+    if (!formData.customerId) return alert("Please select a customer.");
+    if (!formData.vehicleId) return alert("Please select a vehicle.");
+    if (formData.serviceIds.length === 0)
+      return alert("Please select at least one service.");
+    if (!formData.dateTime)
+      return alert("Please select appointment date & time.");
 
     try {
       const body = {
-        userId: Number(formData.customerId), // send customer id as userId (DTO expects userId)
+        userId: Number(formData.customerId),
         vehicleId: Number(formData.vehicleId),
-        serviceId: Number(formData.serviceId),
+        serviceIds: formData.serviceIds.map(Number),
         dateTime: formData.dateTime,
       };
 
@@ -133,7 +125,7 @@ const ServiceAssignment = () => {
         setFormData({
           customerId: "",
           vehicleId: "",
-          serviceId: "",
+          serviceIds: [],
           dateTime: "",
         });
         setVehicles([]);
@@ -151,7 +143,9 @@ const ServiceAssignment = () => {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.heading}>🧾 Assign Service (Create Appointment)</h1>
+      <h1 className={styles.heading}>
+        🧾 Assign Services (Create Appointment)
+      </h1>
 
       <form onSubmit={handleSubmit} className={styles.form}>
         {/* Customer */}
@@ -166,18 +160,14 @@ const ServiceAssignment = () => {
           >
             <option value="">-- Select Customer --</option>
             {customers.map((c) => {
-              // choose candidate id properties (customerId or id or userId)
               const id = c.customerId ?? c.id ?? c.userId;
               const label =
                 `${c.firstName ?? ""} ${c.lastName ?? ""}`.trim() ||
                 c.name ||
                 id;
-              const contact =
-                c.emails && c.emails.length ? ` (${c.emails[0]})` : "";
               return (
-                <option key={String(id)} value={String(id)}>
+                <option key={id} value={id}>
                   {label}
-                  {contact}
                 </option>
               );
             })}
@@ -202,10 +192,9 @@ const ServiceAssignment = () => {
             </option>
             {vehicles.map((v) => {
               const vid = v.vehicleId ?? v.id;
-              const reg =
-                v.registrationNo ?? v.registrationNo ?? v.regNo ?? v.reg;
+              const reg = v.registrationNo ?? v.regNo ?? v.reg ?? "Unknown";
               return (
-                <option key={String(vid)} value={String(vid)}>
+                <option key={vid} value={vid}>
                   {reg} - {v.brand ?? ""} {v.model ?? ""}
                 </option>
               );
@@ -213,31 +202,35 @@ const ServiceAssignment = () => {
           </select>
         </div>
 
-        {/* Service */}
+        {/* Services (multi-select) */}
         <div className={styles.fieldGroup}>
-          <label className={styles.label}>Select Service</label>
+          <label className={styles.label}>Select Services (Multiple)</label>
           <select
-            name="serviceId"
-            value={formData.serviceId}
+            name="serviceIds"
+            multiple
+            value={formData.serviceIds.map(String)}
             onChange={handleChange}
             required
-            className={styles.select}
+            className={styles.multiSelect}
           >
-            <option value="">-- Select Service --</option>
             {services.map((s) => {
               const sid = s.serviceId ?? s.id;
               const name =
                 s.serviceName ?? s.name ?? s.service ?? `Service ${sid}`;
               return (
-                <option key={String(sid)} value={String(sid)}>
+                <option key={sid} value={sid}>
                   {name}
                 </option>
               );
             })}
           </select>
+          <small className={styles.note}>
+            Hold <b>Ctrl (Windows)</b> or <b>Cmd (Mac)</b> to select multiple
+            services.
+          </small>
         </div>
 
-        {/* Date & time */}
+        {/* Date & Time */}
         <div className={styles.fieldGroup}>
           <label className={styles.label}>Appointment Date & Time</label>
           <input

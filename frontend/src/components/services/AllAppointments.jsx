@@ -12,7 +12,7 @@ const AllAppointments = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
-  // Utility function: convert array → map
+  // Utility: convert array → object map
   const toMap = (arr, idKey, labelFn) =>
     arr.reduce((acc, item) => ({ ...acc, [item[idKey]]: labelFn(item) }), {});
 
@@ -37,7 +37,6 @@ const AllAppointments = () => {
         servRes.json(),
       ]);
 
-      // Customer map: name
       setCustomers(
         toMap(
           custData,
@@ -49,7 +48,6 @@ const AllAppointments = () => {
         )
       );
 
-      // Vehicle map: registration + model
       setVehicles(
         toMap(vehData, "vehicleId", (v) =>
           `${v.registrationNo ?? v.regNo ?? "Reg?"} - ${v.brand ?? ""} ${
@@ -58,7 +56,6 @@ const AllAppointments = () => {
         )
       );
 
-      // Service map: service name
       setServices(
         toMap(
           servData,
@@ -71,7 +68,7 @@ const AllAppointments = () => {
     }
   };
 
-  // Fetch appointments (based on filter)
+  // Fetch appointments (with optional status filter)
   const fetchAppointments = async (status = "ALL") => {
     setLoading(true);
     try {
@@ -93,13 +90,11 @@ const AllAppointments = () => {
     }
   };
 
-  // On mount: load data
   useEffect(() => {
     fetchLookupData();
     fetchAppointments();
   }, []);
 
-  // Handle status change
   const handleStatusChange = async (id, newStatus) => {
     try {
       const res = await fetch(
@@ -118,21 +113,25 @@ const AllAppointments = () => {
     }
   };
 
-  // Navigate to Edit Page
-  const handleEdit = (id) => {
-    navigate(`/edit-appointment/${id}`);
-  };
+  const handleEdit = (id) => navigate(`/edit-appointment/${id}`);
 
-  // Generate invoice
   const handleGenerateInvoice = (id) => {
     alert(`🧾 Invoice generated for appointment #${id}`);
+  };
+
+  const handleViewDetails = (id) => navigate(`/appointment-details/${id}`);
+
+  // ✅ Convert serviceIds to comma-separated names
+  const getServiceNames = (serviceIds) => {
+    if (!serviceIds || serviceIds.length === 0) return "—";
+    return serviceIds.map((id) => services[id] ?? `Service ${id}`).join(", ");
   };
 
   return (
     <div className={styles.container}>
       <h1 className={styles.heading}>📋 All Appointments</h1>
 
-      {/* Filter Section */}
+      {/* Filter Dropdown */}
       <div className={styles.filterRow}>
         <label className={styles.label}>Filter by Status:</label>
         <select
@@ -151,7 +150,7 @@ const AllAppointments = () => {
         </select>
       </div>
 
-      {/* Table Section */}
+      {/* Table */}
       {loading ? (
         <p className={styles.loading}>Loading appointments...</p>
       ) : (
@@ -161,7 +160,7 @@ const AllAppointments = () => {
               <th>ID</th>
               <th>Customer</th>
               <th>Vehicle</th>
-              <th>Service</th>
+              <th>Services</th>
               <th>Date & Time</th>
               <th>Status</th>
               <th>Actions</th>
@@ -180,7 +179,7 @@ const AllAppointments = () => {
                   <td>{a.appointmentId}</td>
                   <td>{customers[a.userId] || `User ${a.userId}`}</td>
                   <td>{vehicles[a.vehicleId] || `Vehicle ${a.vehicleId}`}</td>
-                  <td>{services[a.serviceId] || `Service ${a.serviceId}`}</td>
+                  <td>{getServiceNames(a.serviceIds)}</td>
                   <td>{a.dateTime?.replace("T", " ")}</td>
                   <td>
                     <select
@@ -189,7 +188,7 @@ const AllAppointments = () => {
                         handleStatusChange(a.appointmentId, e.target.value)
                       }
                       className={`${styles.statusDropdown} ${
-                        styles[a.status.toLowerCase()]
+                        styles[a.status?.toLowerCase()] || ""
                       }`}
                     >
                       <option value="BOOKED">BOOKED</option>
@@ -198,7 +197,13 @@ const AllAppointments = () => {
                       <option value="CANCELLED">CANCELLED</option>
                     </select>
                   </td>
-                  <td>
+                  <td className={styles.actions}>
+                    <button
+                      onClick={() => handleViewDetails(a.appointmentId)}
+                      className={styles.viewBtn}
+                    >
+                      🔍 View
+                    </button>
                     <button
                       onClick={() => handleEdit(a.appointmentId)}
                       className={styles.editBtn}
