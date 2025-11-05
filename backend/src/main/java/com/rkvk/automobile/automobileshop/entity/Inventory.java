@@ -33,3 +33,4 @@ public class Inventory {
     private Set<Uses> usedInInvoices = new HashSet<>();
 
 }
+

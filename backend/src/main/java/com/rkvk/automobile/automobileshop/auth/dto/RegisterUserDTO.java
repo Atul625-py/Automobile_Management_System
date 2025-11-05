@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,7 +17,7 @@ public class RegisterUserDTO {
     private String firstName;
     private String lastName;
     private String houseNo;
-    private String email;
+    private List<String> emails;;
     private String street;
     private String locality;
     private String city;
