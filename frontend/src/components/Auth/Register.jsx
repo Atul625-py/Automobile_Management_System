@@ -105,16 +105,16 @@ const Register = () => {
 
       const data = await response.json();
 
-      // if (response.ok && data.token) {
-      //   // localStorage.setItem("token", data.token);
-      //   console.log("respose received successfully", data);
-      //   login(); // Update auth context
-      //   alert("🎉 Registration complete & Verified!");
-      //   navigate("/");
-      // } else {
-      //   alert(data.message || "Registration failed!");
-      //   console.log("registration failed for some reason ", data);
-      // }
+      if (response.ok && data.token) {
+        // localStorage.setItem("token", data.token);
+        console.log("respose received successfully", data);
+        login(); // Update auth context
+        alert("🎉 Registration complete & Verified!");
+        navigate("/");
+      } else {
+        alert(data.message || "Registration failed!");
+        console.log("registration failed for some reason ", data);
+      }
     } catch (err) {
       console.error(err);
       // alert("Something went wrong. Please try again.");

@@ -20,6 +20,10 @@ import AddVehicle from "./components/veichles/AddVehicle";
 import OngoingServices from "./components/services/OngoingServices";
 import CompletedServices from "./components/services/CompletedServices";
 import InvoicePage from "./components/invoice/InvoicePage";
+import AllAppointments from "./components/services/AllAppointments";
+import EditAppointment from "./components/services/EditAppointment";
+import AddService from "./components/services/AddService";
+import AppointmentDetail from "./components/appointmentDetail/AppointmentDetail";
 
 // 🆕 Newly added components
 
@@ -57,7 +61,7 @@ function App() {
           <Route path="/addmechanic" element={<AddMechanic />} />
 
           {/* Services */}
-          <Route path="/add-services" element={<ServiceAssignment />} />
+          <Route path="/add-appointment-page" element={<ServiceAssignment />} />
 
           {/* Customers */}
           <Route path="/add-customer" element={<RegisterCustomer />} />
@@ -72,6 +76,7 @@ function App() {
             path="/show-customers"
             element={<ShowCustomers></ShowCustomers>}
           />
+          <Route path="/add-services" element={<AddService></AddService>} />
           <Route path="/add-veichles" element={<AddVehicle></AddVehicle>} />
           {/* <Route
             path="/show-managers"
@@ -110,6 +115,22 @@ function App() {
           <Route
             path="/invoice/edit/:id"
             element={<InvoicePage mode="edit" />}
+          />
+          <Route
+            path="all-appointments"
+            element={<AllAppointments></AllAppointments>}
+          />
+          <Route
+            path="/edit-appointment/:id"
+            element={<EditAppointment></EditAppointment>}
+          />
+          <Route
+            path="/appointment-details/:id"
+            element={<AppointmentDetail></AppointmentDetail>}
+          />
+          <Route
+            path="/invoice/:appointmentId"
+            element={<InvoicePage></InvoicePage>}
           />
         </Routes>
       </div>
