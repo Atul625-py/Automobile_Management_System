@@ -25,6 +25,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain chain) throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+        // 🟢 Skip JWT check for public/static resources
+        if (isPublicPath(path)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         try {
             String header = request.getHeader("Authorization");
             String token = null;
@@ -37,7 +45,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     && SecurityContextHolder.getContext().getAuthentication() == null) {
 
                 String username = jwtUtil.getUsernameFromToken(token);
-
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 UsernamePasswordAuthenticationToken auth =
@@ -48,13 +55,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         );
 
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
+
         } catch (Exception ex) {
-            logger.error("Could not set user authentication in security context", ex);
+            logger.error("❌ JWT Authentication failed: ", ex);
         }
 
         chain.doFilter(request, response);
+    }
+
+    /**
+     * Utility method — defines which paths should be public (no JWT required)
+     */
+    private boolean isPublicPath(String path) {
+        return path.startsWith("/api/auth")
+                || path.startsWith("/images")
+                || path.startsWith("/api/images")
+                || path.startsWith("/css")
+                || path.startsWith("/js")
+                || path.equals("/favicon.ico");
     }
 }
