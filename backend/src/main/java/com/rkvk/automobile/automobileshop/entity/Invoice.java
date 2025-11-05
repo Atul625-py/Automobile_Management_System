@@ -1,10 +1,7 @@
 package com.rkvk.automobile.automobileshop.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,6 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class Invoice {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "invoice_id")
@@ -30,7 +28,14 @@ public class Invoice {
     @Column(name = "labour_cost")
     private Double labourCost;
 
-    @OneToMany(mappedBy = "invoice")
+    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Uses> usedParts = new HashSet<>();
-}
 
+    @ManyToMany
+    @JoinTable(
+            name = "invoice_mechanic",
+            joinColumns = @JoinColumn(name = "invoice_id"),
+            inverseJoinColumns = @JoinColumn(name = "mechanic_id")
+    )
+    private Set<Mechanic> mechanics = new HashSet<>();
+}

@@ -2,6 +2,9 @@
 # GLOBAL SETTINGS
 ############################################
 
+
+
+
 # OS-specific files
 .DS_Store
 Thumbs.db
@@ -14,6 +17,10 @@ Desktop.ini
 *.ipr
 *.iws
 .idea/
+.idea
+*.idea
+.idea/*
+*/.idea
 .vscode/
 *.swp
 *.swo

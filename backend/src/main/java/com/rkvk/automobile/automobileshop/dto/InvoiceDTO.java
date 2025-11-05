@@ -1,10 +1,6 @@
 package com.rkvk.automobile.automobileshop.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.util.Set;
 
 @Data
@@ -16,7 +12,6 @@ public class InvoiceDTO {
     private Long appointmentId;
     private Double taxPercentage;
     private Double labourCost;
-
-    // Flattened view of used parts
     private Set<UsedPartDTO> usedParts;
+    private Set<MechanicDTO> mechanics;
 }

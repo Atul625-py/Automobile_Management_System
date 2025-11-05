@@ -27,7 +27,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
            """)
     List<Invoice> findAllByCustomerId(@Param("customerId") Long customerId);
 
-    // ✅ Get all invoices for a specific vehicle
+    // Get all invoices for a specific vehicle
     @Query("""
            SELECT i
            FROM Invoice i
