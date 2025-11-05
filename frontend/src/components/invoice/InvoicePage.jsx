@@ -1,4 +1,3 @@
-// src/pages/InvoicePage.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./InvoicePage.module.css";
@@ -12,185 +11,144 @@ const InvoicePage = () => {
   const [taxPercentage, setTaxPercentage] = useState("");
   const [labourCost, setLabourCost] = useState("");
   const [usedParts, setUsedParts] = useState([]);
+  const [inventory, setInventory] = useState([]);
+  const [mechanics, setMechanics] = useState([]);
+  const [selectedMechanics, setSelectedMechanics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [inventory, setInventory] = useState([]); // list of all available parts
+  const [message, setMessage] = useState("");
 
-  // ---- Fetch all available inventory parts ----
-  const fetchInventory = async () => {
-    try {
-      const res = await fetch("/api/inventory", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setInventory(data);
-      } else {
-        console.error("Failed to fetch inventory:", res.status);
-      }
-    } catch (err) {
-      console.error("Error fetching inventory:", err);
-    }
+  // Utility for fetch
+  const authHeaders = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
   };
 
-  // ---- Fetch invoice ----
+  // ---- Fetch all needed data once ----
+  useEffect(() => {
+    const init = async () => {
+      try {
+        await Promise.all([fetchInventory(), fetchMechanics()]);
+        await fetchInvoice(); // Only after data is loaded
+      } catch (err) {
+        console.error("Init error:", err);
+        setMessage("⚠️ Failed to load invoice details.");
+      }
+    };
+    init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [appointmentId]);
+
+  // ---- Fetch inventory ----
+  const fetchInventory = async () => {
+    const res = await fetch("/api/inventory", { headers: authHeaders });
+    if (!res.ok) throw new Error("Failed to fetch inventory");
+    setInventory(await res.json());
+  };
+
+  // ---- Fetch mechanics ----
+  const fetchMechanics = async () => {
+    const res = await fetch("/api/mechanics", { headers: authHeaders });
+    if (!res.ok) throw new Error("Failed to fetch mechanics");
+    setMechanics(await res.json());
+  };
+
+  // ---- Fetch invoice for this appointment ----
   const fetchInvoice = async () => {
     setLoading(true);
+    setMessage("");
     try {
       const res = await fetch(`/api/invoices/appointment/${appointmentId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: authHeaders,
       });
+
       if (res.ok) {
         const data = await res.json();
         setInvoice(data);
         setTaxPercentage(data.taxPercentage ?? "");
         setLabourCost(data.labourCost ?? "");
         setUsedParts(
-          Array.from(data.usedParts ?? []).map((p) => ({
-            partId: p.partId ?? p.id ?? p.part?.partId ?? "",
-            count: p.count ?? p.quantity ?? 0,
+          (data.usedParts || []).map((p) => ({
+            partId: p.partId ?? "",
+            count: p.count ?? 0,
           }))
         );
+        setSelectedMechanics((data.mechanics || []).map((m) => m.mechanicId));
       } else if (res.status === 404) {
+        // No invoice yet for this appointment
         setInvoice(null);
         setTaxPercentage("");
         setLabourCost("");
         setUsedParts([]);
+        setSelectedMechanics([]);
+        setMessage("🧾 No invoice yet. You can create one below.");
       } else {
-        const txt = await res.text().catch(() => "");
-        throw new Error(txt || `Status ${res.status}`);
+        const msg = await res.text();
+        throw new Error(msg || `Fetch failed (${res.status})`);
       }
     } catch (err) {
-      console.warn("fetchInvoice:", err);
-      setInvoice(null);
-      setTaxPercentage("");
-      setLabourCost("");
-      setUsedParts([]);
+      console.error("fetchInvoice:", err);
+      setMessage("⚠️ Could not fetch invoice.");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchInvoice();
-    fetchInventory();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [appointmentId]);
-
-  // ---- Helpers for used parts ----
-  const addPartRow = () =>
-    setUsedParts((p) => [...p, { partId: "", count: 1 }]);
-  const removePartRow = (i) =>
-    setUsedParts((p) => p.filter((_, idx) => idx !== i));
-  const updatePartRow = (i, field, value) =>
-    setUsedParts((p) =>
-      p.map((row, idx) => (idx === i ? { ...row, [field]: value } : row))
+  // ---- Part manipulation ----
+  const addPartRow = () => setUsedParts((prev) => [...prev, { partId: "", count: 1 }]);
+  const removePartRow = (index) => setUsedParts((prev) => prev.filter((_, i) => i !== index));
+  const updatePartRow = (index, field, value) =>
+    setUsedParts((prev) =>
+      prev.map((row, i) => (i === index ? { ...row, [field]: value } : row))
     );
 
-  // ---- Save logic ----
+  // ---- Mechanics selection ----
+  const handleMechanicToggle = (id) => {
+    setSelectedMechanics((prev) =>
+      prev.includes(id) ? prev.filter((mid) => mid !== id) : [...prev, id]
+    );
+  };
+
+  // ---- Save (create or update) ----
   const handleSave = async () => {
     setSaving(true);
+    setMessage("");
+
+    const invoiceDTO = {
+      invoiceId: invoice?.invoiceId ?? undefined,
+      appointmentId: Number(appointmentId),
+      taxPercentage: Number(taxPercentage) || 0,
+      labourCost: Number(labourCost) || 0,
+      usedParts: usedParts.map((p) => ({
+        partId: Number(p.partId),
+        count: Number(p.count),
+      })),
+      mechanics: selectedMechanics.map((id) => ({ mechanicId: id })),
+    };
+
+    const method = invoice ? "PUT" : "POST";
+    const url = invoice
+      ? `/api/invoices/${invoice.invoiceId}`
+      : `/api/invoices`;
+
     try {
-      if (usedParts.length === 0 && !invoice) {
-        if (
-          !window.confirm(
-            "No used parts specified. Some backends require at least one part to create an invoice. Continue anyway?"
-          )
-        ) {
-          setSaving(false);
-          return;
-        }
+      const res = await fetch(url, {
+        method,
+        headers: authHeaders,
+        body: JSON.stringify(invoiceDTO),
+      });
+
+      if (!res.ok) {
+        const msg = await res.text().catch(() => "");
+        throw new Error(msg || `${method} failed (${res.status})`);
       }
 
-      const invoiceDTO = {
-        invoiceId: invoice?.invoiceId ?? undefined,
-        appointmentId: Number(appointmentId),
-        taxPercentage: taxPercentage === "" ? null : Number(taxPercentage),
-        labourCost: labourCost === "" ? null : Number(labourCost),
-        usedParts: usedParts.map((p) => ({
-          partId: Number(p.partId),
-          count: Number(p.count),
-        })),
-      };
-
-      // ---- Update existing invoice ----
-      if (invoice && invoice.invoiceId) {
-        const putRes = await fetch(`/api/invoices/${invoice.invoiceId}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(invoiceDTO),
-        });
-        if (!putRes.ok) {
-          const txt = await putRes.text().catch(() => "");
-          throw new Error(txt || `PUT failed (${putRes.status})`);
-        }
-        alert("✅ Invoice updated successfully");
-        await fetchInvoice();
-        setSaving(false);
-        return;
-      }
-
-      // ---- Create invoice using /parts endpoint ----
-      if (usedParts.length > 0) {
-        for (const p of usedParts) {
-          if (!p.partId) {
-            throw new Error("Each used part must have a selected part.");
-          }
-          const url = `/api/invoices/${appointmentId}/parts?partId=${p.partId}&count=${p.count}`;
-          const partRes = await fetch(url, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (!partRes.ok) {
-            const txt = await partRes.text().catch(() => "");
-            throw new Error(
-              `Failed to add part (partId=${p.partId}). ${
-                txt || partRes.status
-              }`
-            );
-          }
-        }
-
-        // Fetch created invoice
-        await fetchInvoice();
-
-        const res = await fetch(`/api/invoices/appointment/${appointmentId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Invoice created but could not fetch it.");
-        const created = await res.json();
-
-        const updateRes = await fetch(`/api/invoices/${created.invoiceId}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            ...invoiceDTO,
-            invoiceId: created.invoiceId,
-          }),
-        });
-        if (!updateRes.ok) {
-          const txt = await updateRes.text().catch(() => "");
-          throw new Error(txt || "Failed to update invoice after creation.");
-        }
-
-        alert("✅ Invoice created & saved successfully");
-        await fetchInvoice();
-        setSaving(false);
-        return;
-      }
-
-      throw new Error(
-        "No invoice exists and no parts provided. Add at least one part or create invoice via backend."
-      );
+      setMessage(invoice ? "✅ Invoice updated successfully!" : "✅ Invoice created successfully!");
+      await fetchInvoice();
     } catch (err) {
       console.error("Invoice save error:", err);
-      alert("❌ Error saving invoice: " + (err.message || err));
+      setMessage(`❌ ${err.message || "Error saving invoice"}`);
+    } finally {
       setSaving(false);
     }
   };
@@ -198,87 +156,92 @@ const InvoicePage = () => {
   if (loading) return <p className={styles.loading}>Loading invoice...</p>;
 
   return (
-    <div className={styles.container}>
-      <h2>Invoice for appointment #{appointmentId}</h2>
+    <div className={styles.wrapper}>
+      <div className={styles.card}>
+        <h2>Invoice for Appointment #{appointmentId}</h2>
+        {message && <div className={styles.message}>{message}</div>}
 
-      <div className={styles.row}>
-        <label>Tax %</label>
-        <input
-          type="number"
-          value={taxPercentage}
-          onChange={(e) => setTaxPercentage(e.target.value)}
-          placeholder="e.g. 18"
-        />
-      </div>
-
-      <div className={styles.row}>
-        <label>Labour Cost</label>
-        <input
-          type="number"
-          value={labourCost}
-          onChange={(e) => setLabourCost(e.target.value)}
-          placeholder="e.g. 200.00"
-        />
-      </div>
-
-      <hr />
-
-      <h3>Used Parts</h3>
-      <p className={styles.help}>
-        Select parts from inventory below. You can add or remove rows as needed.
-      </p>
-
-      {usedParts.map((row, i) => (
-        <div key={i} className={styles.partRow}>
-          <select
-            value={row.partId}
-            onChange={(e) => updatePartRow(i, "partId", e.target.value)}
-            className={styles.inputSmall}
-          >
-            <option value="">Select Part</option>
-            {inventory.map((part) => (
-              <option key={part.partId} value={part.partId}>
-                {part.name} (Available: {part.quantityAvailable}, ₹
-                {part.unitPrice})
-              </option>
-            ))}
-          </select>
-
+        <div className={styles.formRow}>
+          <label>Tax Percentage</label>
           <input
             type="number"
-            placeholder="count"
-            value={row.count}
-            onChange={(e) => updatePartRow(i, "count", e.target.value)}
-            className={styles.inputSmall}
-            min="1"
+            value={taxPercentage}
+            onChange={(e) => setTaxPercentage(e.target.value)}
+            placeholder="e.g. 18"
           />
-          <button
-            type="button"
-            onClick={() => removePartRow(i)}
-            className={styles.removeBtn}
-          >
-            Remove
-          </button>
         </div>
-      ))}
 
-      <div style={{ marginTop: 8 }}>
+        <div className={styles.formRow}>
+          <label>Labour Cost (₹)</label>
+          <input
+            type="number"
+            value={labourCost}
+            onChange={(e) => setLabourCost(e.target.value)}
+            placeholder="e.g. 200"
+          />
+        </div>
+
+        <hr />
+        <h3>Assigned Mechanics</h3>
+        <p className={styles.help}>Select all mechanics who worked on this appointment.</p>
+
+        <div className={styles.mechanicGrid}>
+          {mechanics.map((m) => (
+            <label key={m.mechanicId} className={styles.mechanicItem}>
+              <input
+                type="checkbox"
+                checked={selectedMechanics.includes(m.mechanicId)}
+                onChange={() => handleMechanicToggle(m.mechanicId)}
+              />
+              {m.firstName} {m.lastName} ({m.city})
+            </label>
+          ))}
+        </div>
+
+        <hr />
+        <h3>Used Parts</h3>
+
+        {usedParts.map((row, i) => (
+          <div key={i} className={styles.partRow}>
+            <select
+              value={row.partId}
+              onChange={(e) => updatePartRow(i, "partId", e.target.value)}
+              className={styles.select}
+            >
+              <option value="">Select Part</option>
+              {inventory.map((part) => (
+                <option key={part.partId} value={part.partId}>
+                  {part.name} — ₹{part.unitPrice} ({part.quantityAvailable} left)
+                </option>
+              ))}
+            </select>
+
+            <input
+              type="number"
+              value={row.count}
+              onChange={(e) => updatePartRow(i, "count", e.target.value)}
+              min="1"
+              className={styles.countInput}
+            />
+            <button type="button" onClick={() => removePartRow(i)} className={styles.removeBtn}>
+              ✕
+            </button>
+          </div>
+        ))}
+
         <button type="button" onClick={addPartRow} className={styles.addBtn}>
           + Add Part
         </button>
-      </div>
 
-      <div className={styles.actions}>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className={styles.saveBtn}
-        >
-          {saving ? "Saving..." : "💾 Save Invoice"}
-        </button>
-        <button onClick={() => navigate(-1)} className={styles.backBtn}>
-          ← Back
-        </button>
+        <div className={styles.actions}>
+          <button onClick={handleSave} disabled={saving} className={styles.saveBtn}>
+            {saving ? "Saving..." : "💾 Save Invoice"}
+          </button>
+
+          <button onClick={() => navigate(-1)} className={styles.backBtn}>
+            ← Back
+          </button>
+        </div>
       </div>
     </div>
   );

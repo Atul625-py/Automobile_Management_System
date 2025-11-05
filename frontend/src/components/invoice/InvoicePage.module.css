@@ -1,63 +1,194 @@
-.container {
-  max-width: 600px;
-  margin: 30px auto;
-  padding: 20px;
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 60px 20px;
+  background-color: #f5f6fa;
+  min-height: 90vh;
+}
+
+.card {
   background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 0 10px #ccc;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 550px;
+  animation: fadeIn 0.3s ease;
 }
 
-.heading {
+h2 {
   text-align: center;
-  margin-bottom: 20px;
-  color: #333;
+  margin-bottom: 24px;
+  color: #222;
+  font-weight: 700;
 }
 
-.formGroup {
+.message {
+  text-align: center;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.message:empty {
+  display: none;
+}
+
+.message:has(✅) {
+  background-color: #e6ffed;
+  color: #22863a;
+}
+
+.message:has(❌),
+.message:has(⚠️) {
+  background-color: #ffeef0;
+  color: #d73a49;
+}
+
+.formRow {
   display: flex;
   flex-direction: column;
   margin-bottom: 15px;
 }
 
-.formGroup label {
+.formRow label {
+  font-weight: 600;
+  color: #555;
   margin-bottom: 6px;
-  font-weight: 500;
 }
 
-.formGroup input {
-  padding: 8px;
+.formRow input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  transition: 0.2s ease;
+}
+
+.formRow input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.partRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.select,
+.countInput {
+  flex: 1;
+  padding: 8px 10px;
   border-radius: 6px;
   border: 1px solid #ccc;
+  font-size: 14px;
 }
 
-.actionRow {
+.addBtn {
+  margin-top: 10px;
+  background: #007bff;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.addBtn:hover {
+  background: #0069d9;
+}
+
+.removeBtn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.removeBtn:hover {
+  background: #b52b37;
+}
+
+.actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 20px;
+  margin-top: 25px;
 }
 
 .saveBtn {
-  background-color: #4caf50;
+  background: #28a745;
   color: white;
+  padding: 10px 20px;
   border: none;
-  padding: 10px 15px;
   border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
+  transition: 0.2s;
 }
 
 .saveBtn:hover {
-  background-color: #45a049;
+  background: #218838;
 }
 
 .backBtn {
-  background-color: #777;
+  background: #6c757d;
   color: white;
   border: none;
-  padding: 10px 15px;
   border-radius: 8px;
+  padding: 10px 20px;
   cursor: pointer;
+  transition: 0.2s;
 }
 
 .backBtn:hover {
-  background-color: #555;
+  background: #5a6268;
+}
+
+.loading {
+  text-align: center;
+  font-size: 18px;
+  color: #555;
+  margin-top: 100px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.mechanicGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.mechanicItem {
+  background: #f1f3f5;
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 14px;
+}
+
+.mechanicItem:hover {
+  background: #e9ecef;
+}
+
+.mechanicItem input {
+  margin-right: 6px;
 }

@@ -1,21 +1,24 @@
 package com.rkvk.automobile.automobileshop.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "mechanic")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(onlyExplicitlyIncluded = true)
 public class Mechanic {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mechanic_id")
+    @EqualsAndHashCode.Include
+    @ToString.Include
     private Long mechanicId;
 
     @Column(name = "first_name")
@@ -39,4 +42,3 @@ public class Mechanic {
     @Column(name = "pin_code")
     private String pinCode;
 }
-

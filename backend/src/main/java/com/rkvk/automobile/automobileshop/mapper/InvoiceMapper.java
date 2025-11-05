@@ -2,12 +2,13 @@ package com.rkvk.automobile.automobileshop.mapper;
 
 import com.rkvk.automobile.automobileshop.dto.*;
 import com.rkvk.automobile.automobileshop.entity.*;
+
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class InvoiceMapper {
 
+    /* -------------------- ENTITY → DTO -------------------- */
     public static InvoiceDTO toDTO(Invoice invoice) {
         if (invoice == null) return null;
 
@@ -16,12 +17,12 @@ public class InvoiceMapper {
                 .appointmentId(invoice.getAppointment() != null ? invoice.getAppointment().getAppointmentId() : null)
                 .taxPercentage(invoice.getTaxPercentage())
                 .labourCost(invoice.getLabourCost())
-                .usedParts(mapUsedPartsToDTOs(invoice.getUsedParts()))
-                .mechanics(mapMechanicsToDTOs(invoice.getMechanics()))
+                .usedParts(toUsedPartDTOs(invoice.getUsedParts()))
+                .mechanics(toMechanicDTOs(invoice.getMechanics()))
                 .build();
     }
 
-    private static Set<UsedPartDTO> mapUsedPartsToDTOs(Set<Uses> usedParts) {
+    private static Set<UsedPartDTO> toUsedPartDTOs(Set<Uses> usedParts) {
         if (usedParts == null) return Collections.emptySet();
 
         return usedParts.stream()
@@ -42,25 +43,37 @@ public class InvoiceMapper {
                 .collect(Collectors.toSet());
     }
 
-    private static Set<MechanicDTO> mapMechanicsToDTOs(Set<Mechanic> mechanics) {
+    private static Set<MechanicDTO> toMechanicDTOs(Set<Mechanic> mechanics) {
         if (mechanics == null) return Collections.emptySet();
+
         return mechanics.stream()
+                .filter(Objects::nonNull)
                 .map(MechanicMapper::toDTO)
                 .collect(Collectors.toSet());
     }
 
+    /* -------------------- DTO → ENTITY -------------------- */
     public static Invoice toEntity(InvoiceDTO dto) {
         if (dto == null) return null;
-        Invoice invoice = new Invoice();
-        invoice.setInvoiceId(dto.getInvoiceId());
-        invoice.setTaxPercentage(dto.getTaxPercentage());
-        invoice.setLabourCost(dto.getLabourCost());
-        if (dto.getMechanics() != null) {
+
+        // Initialize sets to prevent null-pointer issues (critical fix)
+        Invoice invoice = Invoice.builder()
+                .invoiceId(dto.getInvoiceId())
+                .taxPercentage(dto.getTaxPercentage())
+                .labourCost(dto.getLabourCost())
+                .usedParts(new HashSet<>())   // ✅ ensure not null
+                .mechanics(new HashSet<>())   // ✅ ensure not null
+                .build();
+
+        // Optional: if mechanics come in DTO (e.g., for update)
+        if (dto.getMechanics() != null && !dto.getMechanics().isEmpty()) {
             Set<Mechanic> mechanicSet = dto.getMechanics().stream()
+                    .filter(Objects::nonNull)
                     .map(MechanicMapper::toEntity)
                     .collect(Collectors.toSet());
             invoice.setMechanics(mechanicSet);
         }
+
         return invoice;
     }
 }

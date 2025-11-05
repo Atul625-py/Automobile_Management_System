@@ -9,6 +9,7 @@ import com.rkvk.automobile.automobileshop.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,7 @@ public class InvoiceService {
 
         invoice = invoiceRepository.save(invoice);
 
-        // ✅ handle used parts and adjust inventory
+        // handle used parts & adjust inventory
         if (dto.getUsedParts() != null) {
             for (UsedPartDTO up : dto.getUsedParts()) {
                 if (up.getPartId() == null) continue;
@@ -49,19 +50,19 @@ public class InvoiceService {
                 part.setQuantityAvailable(part.getQuantityAvailable() - count);
                 inventoryRepository.save(part);
 
-                UsesId usesId = new UsesId(invoice.getInvoiceId(), part.getPartId());
                 Uses uses = Uses.builder()
-                        .id(usesId)
+                        .id(new UsesId(invoice.getInvoiceId(), part.getPartId()))
                         .invoice(invoice)
                         .part(part)
                         .count(count)
                         .build();
+
                 usesRepository.save(uses);
                 invoice.getUsedParts().add(uses);
             }
         }
 
-        // ✅ attach mechanics
+        // attach mechanics
         if (dto.getMechanics() != null) {
             Set<Mechanic> mechanics = dto.getMechanics().stream()
                     .map(m -> mechanicRepository.findById(m.getMechanicId())
@@ -74,25 +75,15 @@ public class InvoiceService {
     }
 
     public InvoiceDTO getInvoiceById(Long id) {
-        Invoice invoice = invoiceRepository.findById(id)
+        return invoiceRepository.findById(id)
+                .map(InvoiceMapper::toDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
-        return InvoiceMapper.toDTO(invoice);
     }
 
     public InvoiceDTO getInvoiceForAppointment(Long appointmentId) {
-        Invoice invoice = invoiceRepository.findByAppointment_AppointmentId(appointmentId)
+        return invoiceRepository.findByAppointment_AppointmentId(appointmentId)
+                .map(InvoiceMapper::toDTO)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found for appointment"));
-        return InvoiceMapper.toDTO(invoice);
-    }
-
-    public List<InvoiceDTO> getInvoicesForCustomer(Long customerId) {
-        return invoiceRepository.findAllByCustomerId(customerId)
-                .stream().map(InvoiceMapper::toDTO).collect(Collectors.toList());
-    }
-
-    public List<InvoiceDTO> getInvoicesForVehicle(Long vehicleId) {
-        return invoiceRepository.findAllByVehicleId(vehicleId)
-                .stream().map(InvoiceMapper::toDTO).collect(Collectors.toList());
     }
 
     @Transactional
@@ -103,7 +94,7 @@ public class InvoiceService {
         invoice.setTaxPercentage(dto.getTaxPercentage());
         invoice.setLabourCost(dto.getLabourCost());
 
-        // ✅ Reconcile used parts
+        // used parts update logic unchanged
         Map<Long, Uses> existingUses = invoice.getUsedParts().stream()
                 .collect(Collectors.toMap(u -> u.getPart().getPartId(), u -> u));
 
@@ -121,7 +112,6 @@ public class InvoiceService {
                 if (existing != null) {
                     int oldCount = existing.getCount();
                     int delta = newCount - oldCount;
-
                     if (delta > 0 && part.getQuantityAvailable() < delta)
                         throw new InsufficientInventoryException("Not enough stock for " + part.getName());
                     part.setQuantityAvailable(part.getQuantityAvailable() - delta);
@@ -145,7 +135,6 @@ public class InvoiceService {
             }
         }
 
-        // ✅ remove deleted used parts (return inventory)
         for (Uses u : new HashSet<>(invoice.getUsedParts())) {
             if (!incomingPartIds.contains(u.getPart().getPartId())) {
                 Inventory part = u.getPart();
@@ -156,7 +145,7 @@ public class InvoiceService {
             }
         }
 
-        // ✅ update mechanics
+        // update mechanics
         if (dto.getMechanics() != null) {
             Set<Mechanic> newMechanics = dto.getMechanics().stream()
                     .map(m -> mechanicRepository.findById(m.getMechanicId())
@@ -172,7 +161,6 @@ public class InvoiceService {
         Invoice invoice = invoiceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
 
-        // restore all used parts to inventory
         for (Uses u : invoice.getUsedParts()) {
             Inventory part = u.getPart();
             part.setQuantityAvailable(part.getQuantityAvailable() + u.getCount());
@@ -181,4 +169,24 @@ public class InvoiceService {
 
         invoiceRepository.delete(invoice);
     }
+    // ---------------------------------------------------------------------------
+// Fetch all invoices for a given customer (via vehicle → appointment chain)
+// ---------------------------------------------------------------------------
+    public List<InvoiceDTO> getInvoicesForCustomer(Long customerId) {
+        List<Invoice> invoices = invoiceRepository.findAllByCustomerId(customerId);
+        return invoices.stream()
+                .map(InvoiceMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    // ---------------------------------------------------------------------------
+// Fetch all invoices for a specific vehicle
+// ---------------------------------------------------------------------------
+    public List<InvoiceDTO> getInvoicesForVehicle(Long vehicleId) {
+        List<Invoice> invoices = invoiceRepository.findAllByVehicleId(vehicleId);
+        return invoices.stream()
+                .map(InvoiceMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
 }
