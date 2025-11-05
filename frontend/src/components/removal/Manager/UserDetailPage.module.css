@@ -1,0 +1,103 @@
+.container {
+  max-width: 750px;
+  margin: 40px auto;
+  padding: 25px;
+  background: #f9fafc;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.title {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 25px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 1rem;
+  color: #444;
+}
+
+.email {
+  color: #555;
+}
+
+.roleBadge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.admin {
+  background-color: #e74c3c;
+}
+
+.manager {
+  background-color: #27ae60;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.deleteBtn {
+  background-color: #e74c3c;
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.deleteBtn:hover {
+  background-color: #c0392b;
+}
+
+.confirm {
+  background-color: #f0ad4e;
+}
+
+.confirm:hover {
+  background-color: #ec971f;
+}
+
+.backBtn {
+  background-color: #3498db;
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.backBtn:hover {
+  background-color: #2980b9;
+}
+
+.loading,
+.error {
+  text-align: center;
+  color: #777;
+  margin-top: 30px;
+  font-size: 1.1rem;
+}
