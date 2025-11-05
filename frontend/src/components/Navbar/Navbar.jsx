@@ -22,7 +22,10 @@ const Navbar = () => {
 
   return (
     <nav className={styles.navbar}>
-      <div className={styles.logo}>RKVK Automobiles</div>
+      <Link to="'/" className={styles.logo}>
+        {" "}
+        RKVK Automobiles
+      </Link>
 
       <div className={styles.navLinks}>
         {/* Customer Dropdown */}
