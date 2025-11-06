@@ -47,7 +47,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Public routes (no authentication)
+                        //  Public routes (no authentication)
                         .requestMatchers(
                                 "/images/**",
                                 "/api/images/**",
@@ -57,11 +57,11 @@ public class SecurityConfig {
                                 "/js/**"
                         ).permitAll()
 
-                        // ✅ Restricted routes
+                        //  Restricted routes
                         .requestMatchers("/api/customers/**").hasAnyAuthority("ADMIN", "RECEPTIONIST")
                         .requestMatchers("/api/vehicles/**").hasAnyAuthority("ADMIN", "RECEPTIONIST")
 
-                        // 🔒 All other routes require authentication
+                        //  All other routes require authentication
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
