@@ -96,9 +96,14 @@ const Navbar = () => {
 
         {/* Vehicle */}
         {(userRole === "RECEPTIONIST" || userRole === "ADMIN") && (
-          <Link to="/add-veichles" className={styles.navLink}>
-            Vehicle
-          </Link>
+          <>
+            <Link to="/add-veichles" className={styles.navLink}>
+              Vehicle
+            </Link>
+            <Link to="/mechanics" className={styles.navLink}>
+              Mechanics
+            </Link>
+          </>
         )}
 
         {/* Inventory */}
@@ -148,9 +153,6 @@ const Navbar = () => {
         )}
 
         {/* Mechanics */}
-        <Link to="/mechanics" className={styles.navLink}>
-          Mechanics
-        </Link>
 
         {/* Login / Logout */}
         {isAuthenticated ? (
