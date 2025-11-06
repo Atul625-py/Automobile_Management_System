@@ -151,7 +151,7 @@ const InvoicePage = () => {
     }
   };
 
-  // ✅ PRINTABLE INVOICE FUNCTION
+  //  PRINTABLE INVOICE FUNCTION
   const handlePrintInvoice = () => {
     if (!usedParts.length && !labourCost) {
       alert("⚠️ Please add parts or labour cost before printing the invoice.");

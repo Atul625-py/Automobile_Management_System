@@ -24,7 +24,7 @@ const ShowUsers = () => {
         const filtered = data.filter(
           (u) =>
             u.role?.toUpperCase() === "ADMIN" ||
-            u.role?.toUpperCase() === "MANAGER"
+            u.role?.toUpperCase() === "RECEPTIONIST"
         );
 
         setUsers(filtered);
